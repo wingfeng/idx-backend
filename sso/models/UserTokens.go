@@ -1,0 +1,19 @@
+package models
+
+import "github.com/wingfeng/backend/utils"
+
+// UserTokens [...]
+type UserTokens struct {
+	UserID string `gorm:"primary_key;column:UserId;type:varchar(255);not null"`
+
+	LoginProvider string `gorm:"primary_key;column:LoginProvider;type:varchar(255);not null"`
+	Name          string `gorm:"primary_key;column:Name;type:varchar(255);not null"`
+	Value         string `gorm:"column:Value;type:longtext"`
+	//	Users         User   `gorm:"association_foreignkey:UserId;foreignkey:Id"`
+	utils.Record `gorm:"embedded"`
+}
+
+//TableName 数据表名称
+func (m *UserTokens) TableName() string {
+	return "UserTokens"
+}

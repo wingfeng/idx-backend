@@ -1,0 +1,9 @@
+port: 8090
+backend:
+  driver: "mysql"
+  connection: "root:123456@tcp(localhost:3306)/sso?&parseTime=true"
+  groupname:  "api/v1/system"
+  enableoidc: true
+  policypath: "../policy/rbac_model.conf"
+  jwtkeyset: "http://localhost:9096/.well-known/openid-configuration/jwks"
+  userendpoint: "http://localhost:9096/connect/userinfo"
