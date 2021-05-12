@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/sso/models"
 	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idx/models"
 )
 
 type APISecretsController struct {

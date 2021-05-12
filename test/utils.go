@@ -18,7 +18,7 @@ var route *gin.Engine
 
 func setupRouter() *gin.Engine {
 	if route == nil {
-		connection := "root:123456@tcp(localhost:3306)/sso?parseTime=true&loc=Local"
+		connection := "root:eATq1GDhsP@tcp(localhost:3306)/idx?&parseTime=true"
 		//初始化DB
 
 		enf := rbac.InitEnforcer("mysql", connection, "../policy/rbac_model.conf")

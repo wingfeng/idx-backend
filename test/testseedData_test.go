@@ -2,12 +2,10 @@ package test
 
 import (
 	"testing"
-	"time"
 
-	sso "github.com/wingfeng/backend/sso/models"
 	"github.com/wingfeng/backend/system/models"
 	"github.com/wingfeng/backend/utils"
-	"gopkg.in/guregu/null.v4"
+	sso "github.com/wingfeng/idx/models"
 
 	"github.com/magiconair/properties/assert"
 )
@@ -60,7 +58,7 @@ func TestSeedData(t *testing.T) {
 
 	err = seedMenu()
 	assert.Equal(t, nil, err)
-	client := &sso.Clients{
+	client := &sso.Client{
 		ID:                               1,
 		ClientID:                         "jsclient1",
 		Enabled:                          true,
@@ -81,9 +79,8 @@ func TestSeedData(t *testing.T) {
 		RefreshTokenExpiration:           1,
 		ClientClaimsPrefix:               "client_",
 		DeviceCodeLifetime:               300,
-		Created:                          null.TimeFrom(time.Now()),
-		Updated:                          null.TimeFrom(time.Now()),
-		EnableLocalLogin:                 true,
+
+		EnableLocalLogin: true,
 		//UserSsoLifetime: , can be zero
 	}
 	db = context.DB()

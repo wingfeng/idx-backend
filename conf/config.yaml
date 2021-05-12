@@ -1,7 +1,7 @@
 port: 8090
 backend:
   driver: "mysql"
-  connection: "root:123456@tcp(localhost:3306)/sso?&parseTime=true"
+  connection: "root:eATq1GDhsP@tcp(localhost:3306)/idx?&parseTime=true"
   groupname:  "api/v1/system"
   enableoidc: true
   policypath: "../policy/rbac_model.conf"
