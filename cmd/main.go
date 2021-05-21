@@ -12,7 +12,6 @@ import (
 	"github.com/wingfeng/backend"
 	"github.com/wingfeng/backend/system/models"
 	"github.com/wingfeng/backend/utils"
-	idxmodels "github.com/wingfeng/idx/models"
 
 	// _ "/docs"
 	"flag"
@@ -68,8 +67,8 @@ func main() {
 
 	}
 	if *gen {
-		row := idxmodels.ClientGrantTypes{}
-		genController(row, "")
+		// row := idxmodels.ClientGrantTypes{}
+		// genController(row, "")
 		// apiRow := models.APIResources{}
 		// genController(apiRow, "")
 		// grant := models.PersistedGrants{}

@@ -11,7 +11,7 @@ require (
 	github.com/casbin/xorm-adapter/v2 v2.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.1
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/spec v0.19.14 // indirect
 	github.com/go-openapi/swag v0.19.12 // indirect

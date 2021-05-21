@@ -38,12 +38,7 @@ func RegisterRouter(api *gin.RouterGroup) {
 	// ctrls["clientproperties"] = ClientpropertiesController
 	ClientsecretsController := &sso.ClientSecretsController{}
 	ctrls["clientsecrets"] = ClientsecretsController
-	ClientRedirectURIsController := &sso.ClientRedirectURIsController{}
-	ctrls["clientredirecturis"] = ClientRedirectURIsController
-	ClientScopesController := &sso.ClientScopesController{}
-	ctrls["clientscopes"] = ClientScopesController
-	ClientGrantTypesController := &sso.ClientGrantTypesController{}
-	ctrls["clientgranttypes"] = ClientGrantTypesController
+
 	// IdentityresourcesController := &controller.IdentityresourcesController{}
 	// ctrls["identityresources"] = IdentityresourcesController
 	// PersistedgrantsController := &controller.PersistedgrantsController{}
