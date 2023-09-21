@@ -4,7 +4,7 @@ COPY ./ /app
 
 ARG APP_VERSION
 ENV GO111MODULE="on"
-ENV GOPROXY=https://goproxy.cn
+#ENV GOPROXY=https://goproxy.cn
 ENV CA_PORT=80
 WORKDIR /app
 RUN go get github.com/gin-gonic/gin/binding@v1.9.1
