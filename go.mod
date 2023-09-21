@@ -2,9 +2,9 @@ module github.com/wingfeng/backend
 
 go 1.20
 
-replace github.com/wingfeng/idx => ../idx
+//replace github.com/wingfeng/idx => ../idx
 
-require (
+require ( 
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.77.1
