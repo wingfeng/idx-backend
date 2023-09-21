@@ -16,7 +16,7 @@ package casbin
 
 import (
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/rbac"
@@ -40,7 +40,7 @@ type IEnforcer interface {
 	SetWatcher(watcher persist.Watcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
-	SetEffector(eft effect.Effector)
+	SetEffector(eft effector.Effector)
 	ClearPolicy()
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
@@ -57,6 +57,8 @@ type IEnforcer interface {
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, []string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
+	BatchEnforce(requests [][]interface{}) ([]bool, error)
+	BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)
@@ -64,6 +66,7 @@ type IEnforcer interface {
 	HasRoleForUser(name string, role string, domain ...string) (bool, error)
 	AddRoleForUser(user string, role string, domain ...string) (bool, error)
 	AddPermissionForUser(user string, permission ...string) (bool, error)
+	AddPermissionsForUser(user string, permissions ...[]string) (bool, error)
 	DeletePermissionForUser(user string, permission ...string) (bool, error)
 	DeletePermissionsForUser(user string) (bool, error)
 	GetPermissionsForUser(user string, domain ...string) [][]string
@@ -107,6 +110,8 @@ type IEnforcer interface {
 	AddPolicies(rules [][]string) (bool, error)
 	AddNamedPolicy(ptype string, params ...interface{}) (bool, error)
 	AddNamedPolicies(ptype string, rules [][]string) (bool, error)
+	AddPoliciesEx(rules [][]string) (bool, error)
+	AddNamedPoliciesEx(ptype string, rules [][]string) (bool, error)
 	RemovePolicy(params ...interface{}) (bool, error)
 	RemovePolicies(rules [][]string) (bool, error)
 	RemoveFilteredPolicy(fieldIndex int, fieldValues ...string) (bool, error)
@@ -117,8 +122,10 @@ type IEnforcer interface {
 	HasNamedGroupingPolicy(ptype string, params ...interface{}) bool
 	AddGroupingPolicy(params ...interface{}) (bool, error)
 	AddGroupingPolicies(rules [][]string) (bool, error)
+	AddGroupingPoliciesEx(rules [][]string) (bool, error)
 	AddNamedGroupingPolicy(ptype string, params ...interface{}) (bool, error)
 	AddNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
+	AddNamedGroupingPoliciesEx(ptype string, rules [][]string) (bool, error)
 	RemoveGroupingPolicy(params ...interface{}) (bool, error)
 	RemoveGroupingPolicies(rules [][]string) (bool, error)
 	RemoveFilteredGroupingPolicy(fieldIndex int, fieldValues ...string) (bool, error)
@@ -126,4 +133,39 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
+
+	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
+	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)
+	UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error)
+
+	UpdateGroupingPolicy(oldRule []string, newRule []string) (bool, error)
+	UpdateGroupingPolicies(oldRules [][]string, newRules [][]string) (bool, error)
+	UpdateNamedGroupingPolicy(ptype string, oldRule []string, newRule []string) (bool, error)
+	UpdateNamedGroupingPolicies(ptype string, oldRules [][]string, newRules [][]string) (bool, error)
+
+	/* Management API with autoNotifyWatcher disabled */
+	SelfAddPolicy(sec string, ptype string, rule []string) (bool, error)
+	SelfAddPolicies(sec string, ptype string, rules [][]string) (bool, error)
+	SelfAddPoliciesEx(sec string, ptype string, rules [][]string) (bool, error)
+	SelfRemovePolicy(sec string, ptype string, rule []string) (bool, error)
+	SelfRemovePolicies(sec string, ptype string, rules [][]string) (bool, error)
+	SelfRemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) (bool, error)
+	SelfUpdatePolicy(sec string, ptype string, oldRule, newRule []string) (bool, error)
+	SelfUpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) (bool, error)
+}
+
+var _ IDistributedEnforcer = &DistributedEnforcer{}
+
+// IDistributedEnforcer defines dispatcher enforcer.
+type IDistributedEnforcer interface {
+	IEnforcer
+	SetDispatcher(dispatcher persist.Dispatcher)
+	/* Management API for DistributedEnforcer*/
+	AddPoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (affected [][]string, err error)
+	RemovePoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (affected [][]string, err error)
+	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (affected [][]string, err error)
+	ClearPolicySelf(shouldPersist func() bool) error
+	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newRule []string) (affected bool, err error)
+	UpdatePoliciesSelf(shouldPersist func() bool, sec string, ptype string, oldRules, newRules [][]string) (affected bool, err error)
+	UpdateFilteredPoliciesSelf(shouldPersist func() bool, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error)
 }

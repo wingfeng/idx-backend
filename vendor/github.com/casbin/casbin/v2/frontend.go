@@ -15,18 +15,37 @@
 package casbin
 
 import (
+	"bytes"
 	"encoding/json"
 )
 
-func CasbinJsGetPermissionForUser(e IEnforcer, user string) ([]byte, error) {
-	policy, err := e.GetImplicitPermissionsForUser(user)
-	if err != nil {
-		return nil, err
+func CasbinJsGetPermissionForUser(e IEnforcer, user string) (string, error) {
+	model := e.GetModel()
+	m := map[string]interface{}{}
+
+	m["m"] = model.ToText()
+
+	pRules := [][]string{}
+	for ptype := range model["p"] {
+		policies := model.GetPolicy("p", ptype)
+		for _, rules := range policies {
+			pRules = append(pRules, append([]string{ptype}, rules...))
+		}
 	}
-	permission := make(map[string][]string)
-	for i := 0; i < len(policy); i++ {
-		permission[policy[i][2]] = append(permission[policy[i][2]], policy[i][1])
+	m["p"] = pRules
+
+	gRules := [][]string{}
+	for ptype := range model["g"] {
+		policies := model.GetPolicy("g", ptype)
+		for _, rules := range policies {
+			gRules = append(gRules, append([]string{ptype}, rules...))
+		}
 	}
-	b, _ := json.Marshal(permission)
-	return b, nil
+	m["g"] = gRules
+
+	result := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(result)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(m)
+	return result.String(), err
 }

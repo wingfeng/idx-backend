@@ -22,9 +22,9 @@ import (
 )
 
 // LoadPolicyLine loads a text line as a policy rule to model.
-func LoadPolicyLine(line string, m model.Model) {
+func LoadPolicyLine(line string, m model.Model) error {
 	if line == "" || strings.HasPrefix(line, "#") {
-		return
+		return nil
 	}
 
 	r := csv.NewReader(strings.NewReader(line))
@@ -34,13 +34,25 @@ func LoadPolicyLine(line string, m model.Model) {
 
 	tokens, err := r.Read()
 	if err != nil {
-		return
+		return err
 	}
 
-	key := tokens[0]
+	return LoadPolicyArray(tokens, m)
+}
+
+// LoadPolicyArray loads a policy rule to model.
+func LoadPolicyArray(rule []string, m model.Model) error {
+	key := rule[0]
 	sec := key[:1]
-	m[sec][key].Policy = append(m[sec][key].Policy, tokens[1:])
-	m[sec][key].PolicyMap[strings.Join(tokens[1:], model.DefaultSep)] = len(m[sec][key].Policy) - 1
+	ok, err := m.HasPolicyEx(sec, key, rule[1:])
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil // skip duplicated policy
+	}
+	m.AddPolicy(sec, key, rule[1:])
+	return nil
 }
 
 // Adapter is the interface for Casbin adapters.

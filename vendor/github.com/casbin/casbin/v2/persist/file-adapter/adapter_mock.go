@@ -50,7 +50,7 @@ func (a *AdapterMock) SavePolicy(model model.Model) error {
 	return nil
 }
 
-func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, model.Model) error) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -61,11 +61,14 @@ func (a *AdapterMock) loadPolicyFile(model model.Model, handler func(string, mod
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
-		handler(line, model)
+		if err2 := handler(line, model); err2 != nil {
+			return err2
+		}
 		if err != nil {
 			if err == io.EOF {
 				return nil
 			}
+			return err
 		}
 	}
 }
@@ -106,6 +109,10 @@ func (a *AdapterMock) RemovePolicies(sec string, ptype string, rules [][]string)
 
 // UpdatePolicy removes a policy rule from the storage.
 func (a *AdapterMock) UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error {
+	return a.GetMockErr()
+}
+
+func (a *AdapterMock) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) error {
 	return a.GetMockErr()
 }
 

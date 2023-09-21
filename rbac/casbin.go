@@ -5,16 +5,17 @@ import (
 	"net/http"
 
 	"github.com/casbin/casbin/v2"
-	xormadapter "github.com/casbin/xorm-adapter/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/lunny/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//InitEnforcer 初始化casbin的Enforcer
+// InitEnforcer 初始化casbin的Enforcer
 func InitEnforcer(driver string, connection string, path string) *casbin.Enforcer {
-	adapter, err := xormadapter.NewAdapter(driver, connection, true)
+	adapter, err := gormadapter.NewAdapter(driver, connection, true)
 	if err != nil {
 		panic(fmt.Sprintf("adapter err is %v", err.Error()))
 	}
@@ -27,7 +28,7 @@ func InitEnforcer(driver string, connection string, path string) *casbin.Enforce
 	return enforcer
 }
 
-//RbacHandle 权限认证中间件
+// RbacHandle 权限认证中间件
 func RbacHandle() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		//rLock.RLock()

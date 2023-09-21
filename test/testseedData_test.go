@@ -60,7 +60,7 @@ func TestSeedData(t *testing.T) {
 	assert.Equal(t, nil, err)
 	client := &sso.Client{
 		ID:                               1,
-		ClientID:                         "jsclient1",
+		ClientCode:                       "jsclient1",
 		Enabled:                          true,
 		ProtocolType:                     "oidc",
 		RequireClientSecret:              false,

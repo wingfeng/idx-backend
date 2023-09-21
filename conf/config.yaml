@@ -1,7 +1,9 @@
 port: 8090
 backend:
-  driver: "mysql"
-  connection: "root:eATq1GDhsP@tcp(localhost:3306)/idx?&parseTime=true"
+  # driver: "pgx"
+  # connection: "root:eATq1GDhsP@tcp(localhost:3306)/idx?&parseTime=true"
+  driver: "postgres"
+  connection: "host=localhost user=root password=pass@word1 dbname=idx port=5432 sslmode=disable TimeZone=Asia/Shanghai"
   groupname:  "api/v1/system"
   enableoidc: true
   policypath: "../policy/rbac_model.conf"

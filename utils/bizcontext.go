@@ -10,6 +10,7 @@ import (
 
 	"github.com/lunny/log"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -79,21 +80,33 @@ func GetDB(driver string, connection string) *gorm.DB {
 	if strings.EqualFold(driver, "") {
 		driver = "mysql"
 	}
-
 	var err error
+	var x *gorm.DB
+
 	sqlDB, err := sql.Open(driver, connection)
-	x, err := gorm.Open(mysql.New(mysql.Config{
-		Conn: sqlDB,
-	}), &gorm.Config{})
+
+	switch driver {
+	case "mysql":
+
+		x, err = gorm.Open(mysql.New(mysql.Config{
+			Conn: sqlDB,
+		}), &gorm.Config{})
+
+	case "postgres":
+		x, err = gorm.Open(postgres.New(postgres.Config{
+			Conn: sqlDB,
+		}), &gorm.Config{})
+
+	}
 
 	if nil != err {
 		log.Error("init" + err.Error())
 	}
-
 	return x
 }
 
-/**
+/*
+*
 分页查询
 */
 func (context *BizContext) Page(rows interface{}, page *Page) error {
@@ -145,8 +158,9 @@ func (context *BizContext) Page(rows interface{}, page *Page) error {
 	return err
 }
 
-//PageComplex 复杂的查询分页
-//@db 通过在外面先构建好基础查询功能的DB在再来实现分页功能
+// PageComplex 复杂的查询分页
+// @db 通过在外面先构建好基础查询功能的DB在再来实现分页功能
+//
 //sample:db := context.DB().Table("wf_steps steps").Select("steps.*,inst.subject").Joins("join wf_instances inst on steps.instance_id=inst.id").Where("steps.executor=? and steps.status<3", "wing")
 func (context *BizContext) PageComplex(db *gorm.DB, page *Page) error {
 	//声明结果变量

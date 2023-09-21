@@ -2,12 +2,14 @@ Casbin
 ====
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/casbin/casbin)](https://goreportcard.com/report/github.com/casbin/casbin)
-[![Build Status](https://travis-ci.org/casbin/casbin.svg?branch=master)](https://travis-ci.org/casbin/casbin)
+[![Build](https://github.com/casbin/casbin/actions/workflows/default.yml/badge.svg)](https://github.com/casbin/casbin/actions/workflows/default.yml)
 [![Coverage Status](https://coveralls.io/repos/github/casbin/casbin/badge.svg?branch=master)](https://coveralls.io/github/casbin/casbin?branch=master)
 [![Godoc](https://godoc.org/github.com/casbin/casbin?status.svg)](https://pkg.go.dev/github.com/casbin/casbin/v2)
 [![Release](https://img.shields.io/github/release/casbin/casbin.svg)](https://github.com/casbin/casbin/releases/latest)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
+[![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)
 [![Sourcegraph](https://sourcegraph.com/github.com/casbin/casbin/-/badge.svg)](https://sourcegraph.com/github.com/casbin/casbin?badge)
+
+[![image](https://door.casdoor.com/image.png)](https://door.casdoor.com/redirect)
 
 **News**: still worry about how to write the correct Casbin policy? ``Casbin online editor`` is coming to help! Try it at: https://casbin.org/editor/
 
@@ -125,7 +127,7 @@ What Casbin does:
 1. enforce the policy in the classic ``{subject, object, action}`` form or a customized form as you defined, both allow and deny authorizations are supported.
 2. handle the storage of the access control model and its policy.
 3. manage the role-user mappings and role-role mappings (aka role hierarchy in RBAC).
-4. support built-in superuser like ``root`` or ``administrator``. A superuser can do anything without explict permissions.
+4. support built-in superuser like ``root`` or ``administrator``. A superuser can do anything without explicit permissions.
 5. multiple built-in operators to support the rule matching. For example, ``keyMatch`` can map a resource key ``/foo/bar`` to the pattern ``/foo*``.
 
 What Casbin does NOT do:
@@ -136,12 +138,12 @@ What Casbin does NOT do:
 ## Installation
 
 ```
-go get github.com/casbin/casbin
+go get github.com/casbin/casbin/v2
 ```
 
 ## Documentation
 
-https://casbin.org/docs/en/overview
+https://casbin.org/docs/overview
 
 ## Online editor
 
@@ -149,7 +151,7 @@ You can also use the online editor (https://casbin.org/editor/) to write your Ca
 
 ## Tutorials
 
-https://casbin.org/docs/en/tutorials
+https://casbin.org/docs/tutorials
 
 ## Get started
 
@@ -168,7 +170,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
     obj := "data1" // the resource that is going to be accessed.
     act := "read" // the operation that the user performs on the resource.
 
-    if res := e.Enforce(sub, obj, act); res {
+    if res, _ := e.Enforce(sub, obj, act); res {
         // permit alice to read data1
     } else {
         // deny the request, show an error
@@ -187,10 +189,10 @@ See [Policy management APIs](#policy-management) for more usage.
 
 Casbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://casbin.org/docs/en/management-api): the primitive API that provides full support for Casbin policy management.
-- [RBAC API](https://casbin.org/docs/en/rbac-api): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code.
+- [Management API](https://casbin.org/docs/management-api): the primitive API that provides full support for Casbin policy management.
+- [RBAC API](https://casbin.org/docs/rbac-api): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code.
 
-We also provide a [web-based UI](https://casbin.org/docs/en/admin-portal) for model management and policy management:
+We also provide a [web-based UI](https://casbin.org/docs/admin-portal) for model management and policy management:
 
 ![model editor](https://hsluoyz.github.io/casbin/ui_model_editor.png)
 
@@ -198,19 +200,19 @@ We also provide a [web-based UI](https://casbin.org/docs/en/admin-portal) for mo
 
 ## Policy persistence
 
-https://casbin.org/docs/en/adapters
+https://casbin.org/docs/adapters
 
 ## Policy consistence between multiple nodes
 
-https://casbin.org/docs/en/watchers
+https://casbin.org/docs/watchers
 
 ## Role manager
 
-https://casbin.org/docs/en/role-managers
+https://casbin.org/docs/role-managers
 
 ## Benchmarks
 
-https://casbin.org/docs/en/benchmark
+https://casbin.org/docs/benchmark
 
 ## Examples
 
@@ -230,11 +232,11 @@ Priority | [priority_model.conf](https://github.com/casbin/casbin/blob/master/ex
 
 ## Middlewares
 
-Authz middlewares for web frameworks: https://casbin.org/docs/en/middlewares
+Authz middlewares for web frameworks: https://casbin.org/docs/middlewares
 
 ## Our adopters
 
-https://casbin.org/docs/en/adopters
+https://casbin.org/docs/adopters
 
 ## How to Contribute
 
@@ -265,6 +267,10 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/casbin/sponsor/7/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/casbin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/casbin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/casbin/sponsor/9/avatar.svg"></a>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=casbin/casbin&type=Date)](https://star-history.com/#casbin/casbin&Date)
 
 ## License
 

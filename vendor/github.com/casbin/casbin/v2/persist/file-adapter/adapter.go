@@ -32,8 +32,16 @@ type Adapter struct {
 	filePath string
 }
 
-func (a *Adapter) UpdatePolicy(sec string, ptype string, oldRule, newPolicy []string) error {
+func (a *Adapter) UpdatePolicy(sec string, ptype string, oldRule, newRule []string) error {
 	return errors.New("not implemented")
+}
+
+func (a *Adapter) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) error {
+	return errors.New("not implemented")
+}
+
+func (a *Adapter) UpdateFilteredPolicies(sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	return nil, errors.New("not implemented")
 }
 
 // NewAdapter is the constructor for Adapter.
@@ -77,7 +85,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 	return a.savePolicyFile(strings.TrimRight(tmp.String(), "\n"))
 }
 
-func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model)) error {
+func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.Model) error) error {
 	f, err := os.Open(a.filePath)
 	if err != nil {
 		return err
@@ -87,7 +95,10 @@ func (a *Adapter) loadPolicyFile(model model.Model, handler func(string, model.M
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		handler(line, model)
+		err = handler(line, model)
+		if err != nil {
+			return err
+		}
 	}
 	return scanner.Err()
 }
