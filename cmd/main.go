@@ -24,6 +24,16 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+var (
+	AppName      string // 应用名称
+	AppVersion   string // 应用版本
+	BuildVersion string // 编译版本
+	BuildTime    string // 编译时间
+	GitRevision  string // Git版本
+	GitBranch    string // Git分支
+	GoVersion    string // Golang信息
+)
+
 type Opts struct {
 	backend.EntryOption `mapstructure:"backend"`
 	Port                int
@@ -33,11 +43,15 @@ type Opts struct {
 
 func main() {
 	confPath := flag.String("conf", "../conf/config.yaml", "配置文件路径")
-
+	showVersion := flag.Bool("ver", false, "程序版本")
 	syncDb := flag.Bool("syncdb", false, "同步数据结构到数据库.")
 	gen := flag.Bool("gen", false, "生成Controller和Test")
 	flag.Parse()
 
+	if *showVersion {
+		Version()
+		return
+	}
 	viper.SetConfigFile(*confPath)
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
@@ -136,6 +150,16 @@ type genStruct struct {
 	Type           string
 	ShortName      string
 	LowerShortName string
+}
+
+func Version() {
+	fmt.Printf("App Name:\t%s\n", AppName)
+	fmt.Printf("App Version:\t%s\n", AppVersion)
+	fmt.Printf("Build version:\t%s\n", BuildVersion)
+	fmt.Printf("Build time:\t%s\n", BuildTime)
+	fmt.Printf("Git revision:\t%s\n", GitRevision)
+	fmt.Printf("Git branch:\t%s\n", GitBranch)
+	fmt.Printf("Golang Version: %s\n", GoVersion)
 }
 
 func gen(genS genStruct, tplFile string, outputName string) {

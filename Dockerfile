@@ -4,9 +4,10 @@ COPY ./ /app
 
 ARG APP_VERSION
 ENV GO111MODULE="on"
-#ENV GOPROXY=https://goproxy.cn
+ENV GOPROXY="https://goproxy.cn"
 ENV CA_PORT=80
 WORKDIR /app
+RUN go env
 RUN go get github.com/gin-gonic/gin/binding@v1.9.1
 RUN go mod vendor
 RUN make APP_VERSION=${APP_VERSION}
@@ -27,9 +28,7 @@ WORKDIR /
 
 COPY --from=builder /app/cmd/idx-backend /app/
 COPY --from=builder /app/conf ./conf
-COPY --from=builder /app/certs ./certs
 
-COPY --from=builder /app/static ./static
 #cluster port
 EXPOSE 80
 CMD ["/app/idx-backend"]

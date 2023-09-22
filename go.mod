@@ -4,7 +4,7 @@ go 1.20
 
 //replace github.com/wingfeng/idx => ../idx
 
-require ( 
+require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.77.1
@@ -29,6 +29,7 @@ require (
 	golang.org/x/crypto v0.9.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gorm.io/driver/mysql v1.5.1
+	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.3
 )
 
@@ -102,7 +103,6 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/postgres v1.5.2 // indirect
 	gorm.io/driver/sqlserver v1.4.1 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect
 	modernc.org/libc v1.22.2 // indirect
