@@ -58,9 +58,9 @@ func main() {
 	viper.AllowEmptyEnv(true)
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("读取配置文件错误: %v \r\n", err))
+		panic(fmt.Errorf("读取配置文件错误: %s ", err))
 	}
-	viper.SetEnvPrefix("QQ")
+	viper.SetEnvPrefix("IDX")
 	viper.AutomaticEnv()
 
 	opts := &Opts{}
