@@ -27,6 +27,7 @@ FROM alpine:latest
 WORKDIR /
 
 COPY --from=builder /app/cmd/idx-backend /app/
+COPY --from=builder /app/policy/ ./policy
 COPY --from=builder /app/conf ./conf
 
 #cluster port
