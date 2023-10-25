@@ -1,4 +1,4 @@
-FROM golang:1.20.5 as builder
+FROM golang:1.21.1 as builder
 WORKDIR ./
 COPY ./ /app
 
@@ -10,6 +10,7 @@ WORKDIR /app
 RUN go env
 RUN go get github.com/gin-gonic/gin/binding@v1.9.1
 RUN go mod vendor
+RUN echo ${APP_VERSION}
 RUN make APP_VERSION=${APP_VERSION}
 
 #RUN go mod vendor
