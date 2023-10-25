@@ -35,7 +35,7 @@ var (
 )
 
 type Opts struct {
-	backend.EntryOption `mapstructure:"backend"`
+	backend.EntryOption //`mapstructure:"backend"`
 	Port                int
 	IP                  string
 	SnowflakeNode       int
@@ -65,6 +65,10 @@ func main() {
 
 	opts := &Opts{}
 	err = viper.Unmarshal(opts)
+	entryOption := &backend.EntryOption{}
+
+	err = viper.Unmarshal(entryOption)
+	opts.EntryOption = *entryOption
 	if err != nil {
 		log.Error("读取配置错误:", err)
 	}
