@@ -2,6 +2,7 @@ package rbac
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/casbin/casbin/v2"
@@ -9,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	"github.com/lunny/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -50,7 +50,7 @@ func RbacHandle() gin.HandlerFunc {
 
 		}
 
-		log.Debug("权限验证不通过")
+		slog.Debug("权限验证不通过")
 		context.JSON(http.StatusForbidden, gin.H{
 			"messages": http.StatusText(http.StatusForbidden),
 			"errInfo":  "抱歉, 您无权访问",

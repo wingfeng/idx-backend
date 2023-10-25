@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/bwmarrin/snowflake"
@@ -64,7 +65,7 @@ func InitContext(driver string, connection string, user string, userId string, d
 	context.db = engine
 	node, err := snowflake.NewNode(1)
 	if err != nil {
-		log.Errorf("创建ID生成器失败")
+		slog.Error("创建ID生成器失败")
 	}
 	context.node = *node
 	return context

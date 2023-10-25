@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/wingfeng/backend/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/lunny/log"
 )
 
 type PermissionParam struct {
@@ -47,13 +47,13 @@ func (ctrl *PermissionController) UpdateMenuPermission(context *gin.Context) {
 	//删除用户所有权限
 	_, err := enf.DeletePermissionsForUser(param.User)
 	if err != nil {
-		log.Error(err)
+		slog.Error(err.Error())
 	}
 	//添加用户所有
 	for _, role := range param.Codes {
 		_, err = enf.AddPolicy(param.User, role, param.Action)
 		if err != nil {
-			log.Error(err)
+			slog.Error(err.Error())
 		}
 	}
 	if err == nil {
@@ -64,8 +64,8 @@ func (ctrl *PermissionController) UpdateMenuPermission(context *gin.Context) {
 
 }
 
-//GetUserPermission 获取用户（或角色）具备的权限
-//@account 用户账号或者角色名称
+// GetUserPermission 获取用户（或角色）具备的权限
+// @account 用户账号或者角色名称
 func (ctrl *PermissionController) GetUserPermission(c *gin.Context) {
 	e, _ := c.Get(utils.Const_CasbinKey)
 	enf := e.(*casbin.Enforcer)

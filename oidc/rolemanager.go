@@ -2,11 +2,11 @@ package oidc
 
 import (
 	"errors"
+	"log/slog"
 	"sort"
 
 	casbinlog "github.com/casbin/casbin/v2/log"
 	"github.com/casbin/casbin/v2/rbac"
-	"github.com/labstack/gommon/log"
 )
 
 type RoleManager struct {
@@ -141,7 +141,7 @@ func (rm *RoleManager) GetUsers(name string, domain ...string) ([]string, error)
 // PrintRoles prints all the roles to log.
 func (rm *RoleManager) PrintRoles() error {
 	for _, role := range rm.allRoles {
-		log.Infof(role.toString())
+		slog.Info(role.toString())
 	}
 	return nil
 }

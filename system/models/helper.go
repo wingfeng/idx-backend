@@ -1,11 +1,12 @@
 package models
 
 import (
-	"github.com/labstack/gommon/log"
+	"log/slog"
+
 	"gorm.io/gorm"
 )
 
-//Sync2Db 将struct同步数据结构到数据库
+// Sync2Db 将struct同步数据结构到数据库
 func Sync2Db(x *gorm.DB) {
 	x.DisableForeignKeyConstraintWhenMigrating = true
 
@@ -22,6 +23,6 @@ func Sync2Db(x *gorm.DB) {
 		new(OptionSet),
 	)
 	if err != nil {
-		log.Errorf("同步数据结构错误,Error:%v", err)
+		slog.Error("同步数据结构错误,Error:%v", err)
 	}
 }

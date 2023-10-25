@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log/slog"
 
-	"github.com/lunny/log"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -65,12 +65,12 @@ func VerifyHashedPasswordV3(hashedPassword []byte, password string) (bool, int) 
 
 	// Read header information
 	prf := readNetworkByteOrder(hashedPassword, 1) //用来决定是选SHA1还是SHA256.
-	log.Printf("Prf:%v", prf)
+	slog.Info("Prf:%v", prf)
 
 	iterCount = int(readNetworkByteOrder(hashedPassword, 5))
-	log.Printf("inter Count:%d", iterCount)
+	//	slog.Printf("inter Count:%d", iterCount)
 	saltLength := int(readNetworkByteOrder(hashedPassword, 9))
-	log.Printf("salt Length:%d", saltLength)
+	//	slog.Printf("salt Length:%d", saltLength)
 	// Read the salt: must be >= 128 bits
 	if saltLength < 128/8 {
 		return false, iterCount

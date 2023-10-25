@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log/slog"
 	"net/http"
 	"strings"
 	"sync"
@@ -14,7 +15,6 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/labstack/gommon/log"
 	"github.com/lestrrat/go-jwx/jwk"
 	"github.com/patrickmn/go-cache"
 	"github.com/wingfeng/backend/utils"
@@ -42,21 +42,21 @@ type UserInfo struct {
 	//	claims        map[string]interface{}
 }
 
-//Init 初始化OIDC相关的参数
+// Init 初始化OIDC相关的参数
 func Init(issuer string, userInfoEndpoint string) {
 	//从Issuer中拿到PublicKey
 	userEndpoint = userInfoEndpoint
-	log.Info("Auth Jwt module starting up...")
+	slog.Info("Auth Jwt module starting up...")
 	set, err := jwk.Fetch(issuer)
 	if err != nil {
-		log.Fatal("获取JWKS 失败!", zap.Error(err))
+		slog.Error("获取JWKS 失败!", zap.Error(err))
 	}
 	key, _ := set.Keys[0].Materialize()
 	publicKey = key.(*rsa.PublicKey)
 	memCache = cache.New(30*time.Second, 10*time.Second)
 }
 
-//AuthWare 通过OpenID的JWT验证客户身份
+// AuthWare 通过OpenID的JWT验证客户身份
 func AuthWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -64,14 +64,14 @@ func AuthWare() gin.HandlerFunc {
 		token, err := verifyHeader(authHeader)
 
 		if err != nil {
-			log.Error("解析token失败", zap.Error(err))
+			slog.Error("解析token失败", zap.Error(err))
 			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
 			c.Next()
 			return
 		}
 		claims, err := extractClaims(token)
 		if err != nil {
-			log.Error("解析token失败", zap.Error(err))
+			slog.Error("解析token失败", zap.Error(err))
 			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
 
 			return
@@ -81,7 +81,7 @@ func AuthWare() gin.HandlerFunc {
 		u, cacheExist := memCache.Get(token)
 		var user *UserInfo
 		if !cacheExist {
-			log.Warn("User Cache不存在,重新写入!")
+			slog.Warn("User Cache不存在,重新写入!")
 			user, err = retrieveUserInfo(token)
 			dt := claims["exp"].(float64)
 			intExp := int64(dt)
@@ -89,7 +89,7 @@ func AuthWare() gin.HandlerFunc {
 			duration := expTime.Sub(time.Now())
 			memCache.Set(token, user, duration)
 			if err != nil {
-				log.Errorf("获取用户信息失败,Err:%v ", err)
+				slog.Error("获取用户信息失败,Err:%v ", err)
 				c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
 				return
 			}
@@ -109,28 +109,28 @@ func AuthWare() gin.HandlerFunc {
 						roles := strings.Split(s, ",")
 						for _, role := range roles {
 							role = strings.Trim(role, "\"")
-							log.Infof("Role %s added", role)
+							slog.Info("Role %s added", role)
 							rm.AddLink(user.Name, role)
 
 						}
 					} else {
 						s = strings.Trim(s, "\"")
-						log.Infof("Role %s added", s)
+						slog.Info("Role %s added", s)
 						rm.AddLink(user.Name, s)
 
 					}
-					log.Info("User Roles:", s)
+					slog.Info("User Roles:", s)
 
 				}
 			}
-			log.Infof("User Claim:%v", user)
+			slog.Info("User Claim:%v", user)
 		} else {
 			user = u.(*UserInfo)
 		}
 
 		mutex.Unlock()
 		if user == nil {
-			log.Errorf("获取用户信息失败,Err:%v ", err)
+			slog.Error("获取用户信息失败,Err:%v ", err)
 			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
 			return
 		}
@@ -182,7 +182,7 @@ func extractClaims(tokenStr string) (jwt.MapClaims, error) {
 	})
 
 	if err != nil {
-		log.Error("解析JWT失败!", zap.Error(err))
+		slog.Error("解析JWT失败!", zap.Error(err))
 		return nil, err
 	}
 

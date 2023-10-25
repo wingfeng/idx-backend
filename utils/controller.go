@@ -2,10 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/lunny/log"
 )
 
 type Controller interface {
@@ -33,7 +33,7 @@ func (ctrl *BaseController) Save(row interface{}, c *gin.Context) {
 
 	err := c.BindJSON(row)
 	if err != nil {
-		log.Errorf("绑定User对象错误!,%v", err.Error())
+		slog.Error("绑定User对象错误!,%v", err.Error())
 		c.AbortWithError(500, err)
 		return
 	}
@@ -51,7 +51,7 @@ func (ctrl *BaseController) Update(row interface{}, c *gin.Context) {
 	//获取修改信息
 	err := c.BindJSON(row)
 	if err != nil {
-		log.Errorf("绑定User对象错误!,%v", err.Error())
+		slog.Error("绑定User对象错误!,%v", err.Error())
 		c.AbortWithError(500, err)
 		return
 	}

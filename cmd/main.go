@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"html/template"
+	"log/slog"
 	"os"
 	"reflect"
 	"strings"
 
-	"github.com/lunny/log"
 	"github.com/spf13/viper"
 	"github.com/wingfeng/backend"
 	"github.com/wingfeng/backend/system/models"
@@ -70,7 +70,7 @@ func main() {
 	err = viper.Unmarshal(entryOption)
 	opts.EntryOption = *entryOption
 	if err != nil {
-		log.Error("读取配置错误:", err)
+		slog.Error("读取配置错误:", err)
 	}
 
 	driver := opts.Driver

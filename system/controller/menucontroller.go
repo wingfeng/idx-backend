@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/wingfeng/backend/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/lunny/log"
 	"github.com/wingfeng/backend/system/models"
 )
 
@@ -29,8 +29,8 @@ func (ctrl *MenuController) save(c *gin.Context) {
 	ctrl.BaseController.Save(row, c)
 }
 
-//PermissionTree 获取带权限的菜单信息
-//@id 菜单ID
+// PermissionTree 获取带权限的菜单信息
+// @id 菜单ID
 func (ctrl *MenuController) PermissionTree(c *gin.Context) {
 	biz := ctrl.BaseController.Prepare(c)
 	items := make([]models.MenuItem, 0)
@@ -70,7 +70,7 @@ func filterMenu(items []models.MenuItem, user string, enforcer casbin.Enforcer) 
 		}
 		r, err := enforcer.Enforce(user, item.Code, op)
 		if err != nil {
-			log.Errorf("判断权限错误,Err:%v ,user:%s,code:%s,operation:%s", err, user, item.Code, op)
+			slog.Error("判断权限错误,Err:%v ,user:%s,code:%s,operation:%s", err, user, item.Code, op)
 		}
 		if r {
 			item.RoleOperations = "{\"toolbar\":[\"新建\",\"批量删除\"],\"table\":[\"编辑\",\"删除\"]}"
@@ -109,13 +109,13 @@ func filterMenu(items []models.MenuItem, user string, enforcer casbin.Enforcer) 
 // 	return result
 // }
 
-//删除菜单
+// 删除菜单
 func (ctrl *MenuController) Delete(c *gin.Context) {
 	row := &models.MenuItem{}
 	ctrl.BaseController.Delete(row, c)
 }
 
-//修改菜单
+// 修改菜单
 func (ctrl *MenuController) Update(c *gin.Context) {
 	row := &models.MenuItem{}
 	ctrl.BaseController.Update(row, c)

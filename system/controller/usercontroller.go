@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/lunny/log"
 	"github.com/wingfeng/backend/system/models"
 	"github.com/wingfeng/backend/utils"
 )
@@ -70,7 +70,7 @@ func (ctrl *UserController) Save(c *gin.Context) {
 	var entity models.User
 	err := c.BindJSON(&entity)
 	if err != nil {
-		log.Errorf("绑定User对象错误!,%v", err.Error())
+		slog.Error("绑定User对象错误!,%v", err.Error())
 		c.AbortWithError(500, err)
 		return
 	}
@@ -142,7 +142,7 @@ func (ctrl *UserController) Plaintext(c *gin.Context) {
 
 }
 
-//修改用户信息
+// 修改用户信息
 func (ctrl *UserController) Update(c *gin.Context) {
 	row := &models.User{}
 	ctrl.BaseController.Update(row, c)
