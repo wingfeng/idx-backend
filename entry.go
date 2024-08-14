@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/oidc"
-	"github.com/wingfeng/backend/rbac"
-	"github.com/wingfeng/backend/routers"
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
+	"github.com/wingfeng/idxadmin/oidc"
+	"github.com/wingfeng/idxadmin/rbac"
+	"github.com/wingfeng/idxadmin/routers"
 )
 
 type EntryOption struct {
@@ -32,7 +32,7 @@ func Init(option EntryOption) {
 	route := option.Group
 
 	if strings.EqualFold(option.GroupName, "") {
-		option.GroupName = "/api/v2/system"
+		option.GroupName = "/v1/system"
 	}
 	api := route.Group(option.GroupName)
 	issuer := option.JWTKeySet
@@ -40,9 +40,9 @@ func Init(option EntryOption) {
 
 	api.Use(func(c *gin.Context) {
 		//在Context内构建Biz Context保证并发时信息不回冲突
-		biz := utils.InitContext(option.Driver, option.Connection, "", "", nil)
-		c.Set(utils.Const_BizContextKey, biz)
-		c.Set(utils.Const_CasbinKey, enf)
+		biz := base.InitContext(option.Driver, option.Connection, "", "", nil)
+		c.Set(base.Const_BizContextKey, biz)
+		c.Set(base.Const_CasbinKey, enf)
 	})
 	if option.EnableOidc {
 		oidc.Init(issuer, userEndpoint)

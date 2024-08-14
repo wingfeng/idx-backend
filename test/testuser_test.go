@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wingfeng/backend/system/models"
+	"github.com/wingfeng/idx/models"
 	"gopkg.in/guregu/null.v4"
 
 	"github.com/magiconair/properties/assert"
@@ -36,10 +36,10 @@ func TestSaveUser(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u := &models.User{
-		ID:             "eaeff30b-2d57-4732-b5a2-d3f6f0a5a710",
-		UserName:       "wing",
+		Id:             "eaeff30b-2d57-4732-b5a2-d3f6f0a5a710",
+		Account:        "admin",
 		Email:          "wing@fire.loc",
-		OUID:           "1328680589330485248",
+		OUId:           "1328680589330485248",
 		OU:             "XX软件有限公司",
 		EmailConfirmed: true,
 		LockoutEnd:     null.TimeFrom(time.Now()),

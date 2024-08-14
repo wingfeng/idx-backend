@@ -1,3 +1,4 @@
 cmd/cmd
+cmd/*.exe
 vendor/
 cmd/idx-backend

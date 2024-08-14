@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/wingfeng/backend/system/models"
+	"github.com/wingfeng/idxadmin/system/models"
 
 	"github.com/magiconair/properties/assert"
 )

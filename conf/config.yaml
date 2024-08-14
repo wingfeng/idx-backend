@@ -7,5 +7,5 @@ connection: "host=localhost user=root password=pass@word1 dbname=idx port=5432 s
 groupname:  "api/v1/system"
 enableoidc: true
 policypath: "../policy/rbac_model.conf"
-jwtkeyset: "http://localhost:9096/.well-known/openid-configuration/jwks"
-userendpoint: "http://localhost:9096/connect/userinfo"
+jwtkeyset: "http://localhost:9097/idx/.well-known/jwks"
+userendpoint: "http://localhost:9097/idx/oauth2/userinfo"

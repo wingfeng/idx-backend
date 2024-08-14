@@ -4,14 +4,14 @@ import (
 	"testing"
 
 	"github.com/magiconair/properties/assert"
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
 )
 
 func TestBizContext_PageComplex(t *testing.T) {
-	context := GetContext()
-	db := context.DB().Table("Users as user").Select("user.*,org.display_name").Joins("join OrganizationUnit as org on user.ouid=org.id").Where("user.UserName='admin'")
+	context := GetBizContext()
+	db := context.DB().Table("users").Select("users.*,org.display_name").Joins("join organization_units as org on users.ou_id=org.id").Where("users.account='admin'")
 	//	data := make(map[string]interface{}, 0)
-	page := &utils.Page{
+	page := &base.Page{
 		Filters:  "",
 		PageSize: 10,
 		CurPage:  1,
@@ -23,7 +23,7 @@ func TestBizContext_PageComplex(t *testing.T) {
 }
 
 func TestGetSet(t *testing.T) {
-	context := GetContext()
+	context := GetBizContext()
 	context.Set("wing", 1)
 	obj := context.Get("wing")
 	obj2 := context.Get("nothing")

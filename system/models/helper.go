@@ -15,11 +15,7 @@ func Sync2Db(x *gorm.DB) {
 
 		new(Category),
 		new(MenuItem),
-		new(OrganizationUnit),
-		new(RoleClaims),
-		new(Role),
-		new(User),
-		new(UserRoles),
+
 		new(OptionSet),
 	)
 	if err != nil {

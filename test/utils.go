@@ -6,40 +6,30 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/gorm/logger"
-
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/rbac"
-	"github.com/wingfeng/backend/routers"
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
+	"github.com/wingfeng/idxadmin/rbac"
+	"github.com/wingfeng/idxadmin/routers"
+	"gorm.io/gorm/logger"
 )
 
 var route *gin.Engine
 
 func setupRouter() *gin.Engine {
 	if route == nil {
-		connection := "root:eATq1GDhsP@tcp(localhost:3306)/idx?&parseTime=true"
+		connection := "host=localhost port=5432 user=root password=pass@word1 dbname=idx sslmode=disable TimeZone=Asia/Shanghai"
 		//初始化DB
 
-		enf := rbac.InitEnforcer("mysql", connection, "../policy/rbac_model.conf")
+		enf := rbac.InitEnforcer("postgres", connection, "../policy/rbac_model.conf")
 		//初始化Gin
 		route = gin.Default()
 		api := route.Group("/api/v1/system")
-		// newLogger := logger.New(
-		// 	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		// 	logger.Config{
-		// 		SlowThreshold: time.Second, // 慢 SQL 阈值
-		// 		LogLevel:      logger.Info, // Log level
-		// 		Colorful:      false,       // 禁用彩色打印
-		// 	},
-		// )
+
 		//api.Use(oidc.AuthWare())
 		api.Use(func(c *gin.Context) {
-			biz := utils.InitContext("mysql", connection, "员工", "1", newLogger)
+			biz := GetBizContext()
 
-			c.Set(utils.Const_UserIDKey, "1")
-			c.Set(utils.Const_UserNameKey, "员工")
-			c.Set(utils.Const_BizContextKey, biz)
+			c.Set(base.Const_BizContextKey, biz)
 			c.Set("casbin", enf)
 		})
 		fmt.Println("Hello World!")
@@ -49,7 +39,7 @@ func setupRouter() *gin.Engine {
 	return route
 }
 
-func GetContext() *utils.BizContext {
+func GetBizContext() *base.BizContext {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -58,7 +48,7 @@ func GetContext() *utils.BizContext {
 			Colorful:      false,       // 禁用彩色打印
 		},
 	)
-	connection := "root:123456@tcp(localhost:3306)/OrgDb?parseTime=true"
-	biz := utils.InitContext("mysql", connection, "fenggr", "1", newLogger)
+	connection := "host=localhost port=5432 user=root password=pass@word1 dbname=idx sslmode=disable TimeZone=Asia/Shanghai"
+	biz := base.InitContext("pgx", connection, "fenggr", "1", newLogger)
 	return biz
 }

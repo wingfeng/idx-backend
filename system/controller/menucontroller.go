@@ -4,15 +4,16 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
+	"github.com/wingfeng/idxadmin/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/system/models"
+	"github.com/wingfeng/idxadmin/system/models"
 )
 
 type MenuController struct {
-	utils.BaseController
+	base.BaseController
 }
 
 func (ctrl *MenuController) RegisterRouters(v *gin.RouterGroup) {
@@ -38,7 +39,7 @@ func (ctrl *MenuController) PermissionTree(c *gin.Context) {
 	biz.DB().Model(&models.MenuItem{}).Order("sort_order").Find(&items)
 	items = filterMenu(items, biz.User, *biz.Enforcer)
 	menus := utils.BuildMenuTree(items)
-	c.JSON(200, utils.SysResult{
+	c.JSON(200, base.SysResult{
 		Code: 200,
 		Msg:  "",
 		Data: menus,
@@ -55,7 +56,7 @@ func (ctrl *MenuController) Tree(c *gin.Context) {
 	items := make([]models.MenuItem, 0)
 	biz.DB().Order("sort_order").Find(&items)
 	menus := utils.BuildMenuTree(items)
-	c.JSON(200, utils.SysResult{
+	c.JSON(200, base.SysResult{
 		Code: 200,
 		Msg:  "",
 		Data: menus,

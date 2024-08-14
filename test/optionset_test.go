@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/magiconair/properties/assert"
-	"github.com/wingfeng/backend/system/models"
+	"github.com/wingfeng/idxadmin/system/models"
 )
 
 const (

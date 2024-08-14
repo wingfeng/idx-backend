@@ -3,25 +3,29 @@ package main
 import (
 	"bufio"
 	"html/template"
+	"io/fs"
 	"log/slog"
 	"os"
+	"path"
 	"reflect"
 	"strings"
 
 	"github.com/spf13/viper"
-	"github.com/wingfeng/backend"
-	"github.com/wingfeng/backend/system/models"
-	"github.com/wingfeng/backend/utils"
+	backend "github.com/wingfeng/idxadmin"
 
-	// _ "/docs"
 	"flag"
 	"fmt"
+
+	idxmodels "github.com/wingfeng/idx/models"
+	"github.com/wingfeng/idxadmin/system/models"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/wingfeng/idxadmin/base"
+	_ "github.com/wingfeng/idxadmin/docs"
 )
 
 var (
@@ -78,15 +82,16 @@ func main() {
 	if *syncDb {
 		connection := opts.Connection
 		//初始化DB
-		dbEngine := utils.GetDB(driver, connection)
+		dbEngine := base.GetDB(driver, connection)
 		models.Sync2Db(dbEngine)
 		fmt.Println("同步数据库完成")
 		return
 
 	}
 	if *gen {
-		// row := idxmodels.ClientGrantTypes{}
-		// genController(row, "")
+		slog.Info("Beging generate controller and test")
+		row := idxmodels.Client{}
+		genController(row, "", "oauth2")
 		// apiRow := models.APIResources{}
 		// genController(apiRow, "")
 		// grant := models.PersistedGrants{}
@@ -101,8 +106,10 @@ func main() {
 		// genController(Apisecrets, "")
 		return
 	}
+
 	//初始化Gin
 	route := gin.Default()
+	route.Static("/", "../front/dist")
 
 	route.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:9000", "http://192.168.0.106:8080", "http://192.168.0.101:8080"},
@@ -111,29 +118,20 @@ func main() {
 		AllowCredentials: true,
 		//	MaxAge:           12 * time.Hour,
 	}))
-	group := route.Group("/")
+	group := route.Group("/api")
 	option := opts.EntryOption
-	//  backend.EntryOption{
-	// 	Driver:     driver,
-	// 	Connection: connection,
-	// 	Group:      group,
-	// 	GroupName:  "api/v1/system",
-	// 	EnableOidc: true,
-	// 	PolicyPath: "../policy/rbac_model.conf",
-	// }
+
 	option.Group = group
 	backend.Init(option)
-	//swagger
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
 
-	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	node, _ := snowflake.NewNode(1)
 	fmt.Printf("程序实例启动 %v\r\n", node.Generate())
 	route.Run(fmt.Sprintf("%s:%d", opts.IP, opts.Port))
 
 }
 
-func genController(row interface{}, shortName string) {
+func genController(row interface{}, shortName string, module string) {
 	tp := reflect.TypeOf(row)
 
 	name := tp.String()
@@ -146,8 +144,16 @@ func genController(row interface{}, shortName string) {
 		ShortName:      shortName,
 		LowerShortName: strings.ToLower(shortName),
 	}
-	gen(gens, "../templates/controller.tpl", "../system/controller/"+shortName+"controller.go")
-	gen(gens, "../templates/test.tpl", "../test/"+shortName+"_test.go")
+	o := fmt.Sprintf("../%s/controller/%scontroller.go", module, shortName)
+	otest := fmt.Sprintf("../test/%s/%s_test.go", module, shortName)
+	err := os.MkdirAll(path.Join("..", module, "controller"), fs.ModeAppend)
+	os.MkdirAll(path.Join("..", "test", module), fs.ModeAppend)
+	if err != nil {
+		slog.Error("create directory error:", "err", err.Error())
+	}
+	slog.Info("生成文件:", "file", o)
+	gen(gens, "../templates/controller.tpl", o)
+	gen(gens, "../templates/test.tpl", otest)
 }
 
 type genStruct struct {

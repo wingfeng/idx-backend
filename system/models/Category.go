@@ -6,13 +6,14 @@ type Category struct {
 	Code        string `gorm:"column:code;unique;index;type:varchar(36);not null"`
 	Parent      string `gorm:"column:parent;type:varchar(36);"`
 	Path        string `gorm:"column:path;type:varchar(1024);"`
-	SortOrder   int    `gorm:"column:sort_order;type:int(11);"`
+	SortOrder   int    `gorm:"column:sort_order;type:int;"`
 	Description string `gorm:"column:description;type:varchar(1024);"`
 }
 
 func (r *Category) GetID() interface{} {
 	return r.ID
 }
-func (r *Category) TableName() string {
-	return "Categories"
-}
+
+// func (r *Category) TableName() string {
+// 	return "Categories"
+// }

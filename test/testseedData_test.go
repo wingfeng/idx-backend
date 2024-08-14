@@ -3,24 +3,38 @@ package test
 import (
 	"testing"
 
-	"github.com/wingfeng/backend/system/models"
-	"github.com/wingfeng/backend/utils"
-	sso "github.com/wingfeng/idx/models"
-
 	"github.com/magiconair/properties/assert"
+	idxutil "github.com/wingfeng/idx-oauth2/utils"
+	"github.com/wingfeng/idx/models"
+	"github.com/wingfeng/idxadmin/base"
+	systemmodels "github.com/wingfeng/idxadmin/system/models"
 )
 
 var (
-	context *utils.BizContext
+	context *base.BizContext
 )
 
+func TestSync2Db(t *testing.T) {
+	context := GetBizContext()
+	err := context.DB().AutoMigrate(
+		&systemmodels.Category{},
+		&systemmodels.MenuItem{},
+		&systemmodels.OptionSet{},
+	)
+	if err != nil {
+		t.Log(err)
+		panic(err)
+	}
+	assert.Equal(t, nil, err)
+}
 func TestSeedData(t *testing.T) {
 	//	node, err := snowflake.NewNode(1)
 
 	//初始化DB
-	context = utils.InitContext("mysql", "root:123456@tcp(localhost:3306)/sso-v2?&parseTime=true", "fenggr", "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e", nil)
+	context = GetBizContext()
+
 	ou := &models.OrganizationUnit{}
-	ou.ID = "1328680589330485248"
+	ou.Id = "1328680589330485248"
 	ou.Name = "XX软件"
 	ou.DisplayName = "XX软件有限公司"
 	db := context.DB()
@@ -30,14 +44,14 @@ func TestSeedData(t *testing.T) {
 	}
 
 	user := &models.User{}
-	user.ID = "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e"
-	user.UserName = "admin"
+	user.Id = "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e"
+	user.Account = "admin"
 	user.DisplayName = "管理员"
 	user.Email = "admin@fire.loc"
-	user.OUID = ou.ID
+	user.OUId = ou.Id
 	user.OU = ou.DisplayName
 
-	user.PasswordHash = utils.GenHashedPWD("fire@123")
+	user.PasswordHash, _ = idxutil.HashPassword("fire@123")
 	db = context.DB()
 	err = db.Save(user).Error
 	if err != nil {
@@ -45,32 +59,34 @@ func TestSeedData(t *testing.T) {
 	}
 	role := &models.Role{}
 
-	role.ID = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43b"
+	role.Id = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43b"
 	role.Name = "SystemAdmin"
 	addRole(role)
-	addUserRole(user.ID, ou.ID, role.ID)
+	addUserRole(user.Id, ou.Id, role.Id)
 	role = &models.Role{}
 
-	role.ID = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43c"
+	role.Id = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43c"
 	role.Name = "科室主任"
 	addRole(role)
-	addUserRole(user.ID, ou.ID, role.ID)
+	addUserRole(user.Id, ou.Id, role.Id)
 
 	err = seedMenu()
 	assert.Equal(t, nil, err)
-	client := &sso.Client{
-		ID:                               1,
-		ClientCode:                       "jsclient1",
+	client := &models.Client{
+		Id:                               1,
+		ClientId:                         "jsclient1",
 		Enabled:                          true,
 		ProtocolType:                     "oidc",
-		RequireClientSecret:              false,
+		RequireSecret:                    false,
 		ClientName:                       "Javascript Client",
 		RequireConsent:                   true,
+		RedirectUris:                     "http://localhost:9000",
+		Scopes:                           "openid profile email api1 api2",
 		AllowRememberConsent:             true,
-		AlwaysIncludeUserClaimsInIDToken: false,
+		GrantTypes:                       "implicit",
 		AllowAccessTokensViaBrowser:      true,
 		BackChannelLogoutSessionRequired: true,
-		IDentityTokenLifetime:            300,
+		IdentityTokenLifetime:            300,
 		AccessTokenLifetime:              3600,
 		AbsoluteRefreshTokenLifetime:     2592000,
 		SlidingRefreshTokenLifetime:      2592000,
@@ -85,55 +101,19 @@ func TestSeedData(t *testing.T) {
 	}
 	db = context.DB()
 	db.Save(client)
-	cg := &sso.ClientGrantTypes{
-		ID:        1,
-		ClientID:  1,
-		GrantType: "implicit",
-	}
-	db = context.DB()
-	err = db.Save(cg).Error
+
 	if err != nil {
 		panic(err)
 	}
 
-	addRedirectURI(1, "http://localhost:9000/#/CallBack?", 1)
-	addRedirectURI(2, "http://localhost:9000", 1)
-	addClientScope(1, "openid", 1)
-	addClientScope(2, "profile", 1)
-	addClientScope(3, "roles", client.ID)
 }
-func addRedirectURI(id int, uri string, clientid int) {
 
-	redUris := &sso.ClientRedirectURIs{
-		ID:          id,
-		RedirectURI: uri,
-		ClientID:    clientid,
-	}
-	db := context.DB()
-	err := db.Save(redUris).Error
-	if err != nil {
-
-		panic(err)
-	}
-}
-func addClientScope(id int, scope string, clientid int) {
-	sc := &sso.ClientScopes{
-		ID:       id,
-		Scope:    scope,
-		ClientID: clientid,
-	}
-	db := context.DB()
-	err := db.Save(sc).Error
-	if err != nil {
-		panic(err)
-	}
-}
 func addUserRole(uid, ouid, rid string) {
 	db := context.DB()
 	ur := &models.UserRoles{
-		RoleID: rid,
-		UserID: uid,
-		OUID:   ouid,
+		RoleId: rid,
+		UserId: uid,
+		OUId:   ouid,
 	}
 	//联合主键的直接用engine来处理
 	err := db.Save(ur).Error
@@ -152,7 +132,7 @@ func seedMenu() error {
 	db := context.DB()
 	//node, err := snowflake.NewNode(1)
 	//	id := "1328680589439537153" //node.Generate().String()
-	m := &models.MenuItem{}
+	m := &systemmodels.MenuItem{}
 
 	m.ID = "1328680589439537152"
 	m.Path = "/1"

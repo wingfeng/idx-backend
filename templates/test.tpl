@@ -1,7 +1,7 @@
 package test
 
 import (
-		"github.com/wingfeng/backend/system/models"
+		"github.com/wingfeng/idxadmin/system/models"
     
 	"bytes"
 	"encoding/json"
@@ -20,7 +20,7 @@ func TestSave{{.ShortName}}(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u := &{{.Type}}{
-		ID:             "1",	
+		Id:             "1",	
 	}
 	json, _ := json.Marshal(u)
 	strJson := string(json)

@@ -2,11 +2,11 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
 )
 
 type UtilsController struct {
-	utils.BaseController
+	base.BaseController
 }
 
 func (ctrl *UtilsController) RegisterRouters(v1 *gin.RouterGroup) {

@@ -3,7 +3,7 @@ package models
 import (
 	"strings"
 
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
 
 	"gorm.io/gorm"
 )
@@ -14,7 +14,7 @@ type MenuItem struct {
 	Icon           string     `json:"icon" gorm:"type:varchar(255)"`
 	URL            string     `json:"url" gorm:"type:varchar(255)"`
 	Component      string     `json:"component" gorm:"type:varchar(255)"`
-	SortOrder      int        `json:"sortorder" `
+	SortOrder      int        `json:"sort_order" `
 	Operations     string     `json:"operations" gorm:"type:varchar(255)"`
 	Path           string     `json:"path" gorm:"type:varchar(2048)"`
 	Parent         string     `json:"parent" gorm:"type:varchar(36)"`
@@ -22,13 +22,14 @@ type MenuItem struct {
 	Hidden         bool       `json:"hidden"`
 	Children       []MenuItem `json:"nodes" gorm:"-"`
 	RoleOperations string     `json:"role_operations" gorm:"-"`
-	utils.Record   `gorm:"embedded"`
+	base.Record    `gorm:"embedded"`
 }
 
-//TableName 数据表名称
-func (m *MenuItem) TableName() string {
-	return "Menus"
-}
+// TableName 数据表名称
+//
+//	func (m *MenuItem) TableName() string {
+//		return "Menus"
+//	}
 func (m *MenuItem) ParentID() interface{} {
 	return m.Parent
 }

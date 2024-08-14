@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lestrrat/go-jwx/jwk"
 	"github.com/patrickmn/go-cache"
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +49,7 @@ func Init(issuer string, userInfoEndpoint string) {
 	slog.Info("Auth Jwt module starting up...")
 	set, err := jwk.Fetch(issuer)
 	if err != nil {
-		slog.Error("获取JWKS 失败!", zap.Error(err))
+		slog.Error("获取JWKS 失败!", "message", err.Error(), "issuer", issuer)
 	}
 	key, _ := set.Keys[0].Materialize()
 	publicKey = key.(*rsa.PublicKey)
@@ -65,14 +65,14 @@ func AuthWare() gin.HandlerFunc {
 
 		if err != nil {
 			slog.Error("解析token失败", zap.Error(err))
-			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
+			c.AbortWithStatusJSON(401, base.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
 			c.Next()
 			return
 		}
 		claims, err := extractClaims(token)
 		if err != nil {
 			slog.Error("解析token失败", zap.Error(err))
-			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
+			c.AbortWithStatusJSON(401, base.SysResult{Code: 401, Msg: "解析token失败", Data: err.Error()})
 
 			return
 		}
@@ -90,11 +90,11 @@ func AuthWare() gin.HandlerFunc {
 			memCache.Set(token, user, duration)
 			if err != nil {
 				slog.Error("获取用户信息失败,Err:%v ", err)
-				c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
+				c.AbortWithStatusJSON(401, base.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
 				return
 			}
 			//将rbac现有用户的角色清除
-			e, enableCasbin := c.Get(utils.Const_CasbinKey)
+			e, enableCasbin := c.Get(base.Const_CasbinKey)
 			if enableCasbin {
 				ef := e.(*casbin.Enforcer)
 				ef.DeleteRolesForUser(user.Name)
@@ -131,15 +131,15 @@ func AuthWare() gin.HandlerFunc {
 		mutex.Unlock()
 		if user == nil {
 			slog.Error("获取用户信息失败,Err:%v ", err)
-			c.AbortWithStatusJSON(401, utils.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
+			c.AbortWithStatusJSON(401, base.SysResult{Code: 401, Msg: "获取用户信息失败", Data: err.Error()})
 			return
 		}
 		//设置当前用户信息
-		c.Set(utils.Const_UserIDKey, user.Subject)
+		c.Set(base.Const_UserIDKey, user.Subject)
 		// c.Set("preferred_username", claims["preferred_username"])
-		c.Set(utils.Const_UserNameKey, user.DisplayName)
-		c.Set(utils.Const_OUIDKey, user.OUID)
-		c.Set(utils.Const_OUKey, user.OU)
+		c.Set(base.Const_UserNameKey, user.DisplayName)
+		c.Set(base.Const_OUIDKey, user.OUID)
+		c.Set(base.Const_OUKey, user.OU)
 		c.Next()
 	}
 }

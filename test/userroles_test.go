@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/wingfeng/backend/system/models"
+	"github.com/wingfeng/idx/models"
 
 	"github.com/magiconair/properties/assert"
 )
@@ -33,9 +33,9 @@ func TestSaveUserRoles(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u := &models.UserRoles{
-		UserID: "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e",
-		RoleID: "d4d1a7f6-9f33-4ed6-a320-df3754c6e43b",
-		OUID:   "1328680589330485248",
+		UserId: "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e",
+		RoleId: "d4d1a7f6-9f33-4ed6-a320-df3754c6e43b",
+		OUId:   "1328680589330485248",
 	}
 	json, _ := json.Marshal(u)
 	strJson := string(json)

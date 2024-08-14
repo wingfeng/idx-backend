@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,12 +8,14 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/wingfeng/backend/system/models"
-	"github.com/wingfeng/backend/utils"
+	oauthUtil "github.com/wingfeng/idx-oauth2/utils"
+	"github.com/wingfeng/idx/models"
+	"github.com/wingfeng/idxadmin/base"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserController struct {
-	utils.BaseController
+	base.BaseController
 }
 
 // JWT 签名结构
@@ -51,8 +52,8 @@ type NewPassword struct {
 }
 
 type userLogin struct {
-	username string `json:"username"`
-	password string `json:"password"`
+	username string `json:"username" binding:"required"`
+	password string `json:"password" binding:"required"`
 }
 
 func (ctrl *UserController) RegisterRouters(v1 *gin.RouterGroup) {
@@ -74,16 +75,16 @@ func (ctrl *UserController) Save(c *gin.Context) {
 		c.AbortWithError(500, err)
 		return
 	}
-	password := utils.RandSeq(8)
-	entity.PasswordHash = utils.GenHashedPWD(password)
+	password := "adfbcefe"
+	entity.PasswordHash, _ = oauthUtil.HashPassword(password)
 	entity.IsTemporaryPassword = true
 	biz := ctrl.Prepare(c)
 	err = biz.DB().Save(&entity).Error
 	if err != nil {
-		c.JSON(500, utils.SysResult{500, "Error", err.Error()})
+		c.JSON(500, base.SysResult{500, "Error", err.Error()})
 		return
 	}
-	c.JSON(200, utils.SysResult{200, "Success", password})
+	c.JSON(200, base.SysResult{200, "Success", password})
 }
 func (ctrl *UserController) Delete(ctx *gin.Context) {
 	u := &models.User{}
@@ -102,7 +103,7 @@ func (ctrl *UserController) ChangePassword(ctx *gin.Context) {
 	var u NewPassword
 	err := ctx.BindJSON(&u)
 	if err != nil {
-		ctx.JSON(200, utils.SysResult{200, "绑定User对象错误!", nil})
+		ctx.JSON(200, base.SysResult{200, "绑定User对象错误!", nil})
 		return
 	}
 	biz := ctrl.Prepare(ctx)
@@ -110,22 +111,22 @@ func (ctrl *UserController) ChangePassword(ctx *gin.Context) {
 	user := &models.User{}
 	err = biz.DB().Where("id = ?", u.ID).First(&user).Error
 	if err != nil {
-		ctx.JSON(500, utils.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
+		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
 		return
 	}
 	//判断密码是否一致
-	decodedHashedPassword, _ := base64.StdEncoding.DecodeString(user.PasswordHash)
-	if r, _ := utils.VerifyHashedPasswordV3(decodedHashedPassword, u.OidPassword); r {
-		err = biz.DB().Model(&user).Updates(map[string]interface{}{"PasswordHash": utils.GenHashedPWD(u.PasswordHash), "IsTemporaryPassword": false}).Error
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(u.OidPassword)); err == nil {
+		err = biz.DB().Model(&user).Updates(map[string]interface{}{"PasswordHash": u.PasswordHash, "IsTemporaryPassword": false}).Error
 		if err != nil {
-			ctx.JSON(500, utils.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
+			ctx.JSON(500, base.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
 			return
 		}
 	} else {
-		ctx.JSON(500, utils.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
+		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
 		return
 	}
-	ctx.JSON(200, utils.SysResult{200, "", nil})
+	ctx.JSON(200, base.SysResult{200, "", nil})
 }
 func (ctrl *UserController) Plaintext(c *gin.Context) {
 	//u := &models.User{}
@@ -133,12 +134,12 @@ func (ctrl *UserController) Plaintext(c *gin.Context) {
 	//id := c.Query("id")
 	//err := biz.DB().Where("id=?", id).First(&u).Error
 	//if err != nil {
-	//	c.JSON(500, utils.SysResult{500, err.Error(), err})
+	//	c.JSON(500, base.SysResult{500, err.Error(), err})
 	//	return
 	//}
 	//
 	//
-	//c.JSON(200, utils.SysResult{200, "", row})
+	//c.JSON(200, base.SysResult{200, "", row})
 
 }
 
@@ -151,7 +152,7 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 	var loginParam userLogin
 	err := ctx.BindJSON(&loginParam)
 	if err != nil {
-		ctx.JSON(200, utils.SysResult{200, "绑定User对象错误!", nil})
+		ctx.JSON(400, base.SysResult{400, "绑定User对象错误!", err})
 		return
 	}
 	biz := ctrl.Prepare(ctx)
@@ -159,19 +160,19 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 	user := &models.User{}
 	err = biz.DB().Where("UserName = ?", loginParam.username).First(&user).Error
 	if err != nil {
-		ctx.JSON(500, utils.SysResult{500, fmt.Sprintf("用户登录失败!"), loginParam.username})
+		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("用户%s登录失败!", loginParam.username), loginParam.username})
 		return
 	}
 	//判断密码是否一致
-	decodedHashedPassword, _ := base64.StdEncoding.DecodeString(user.PasswordHash)
-	if r, _ := utils.VerifyHashedPasswordV3(decodedHashedPassword, loginParam.password); r {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(loginParam.password)); err == nil {
 		claims := &CustomClaims{}
-		claims.Subject = user.ID
+		claims.Subject = user.Id
 		claims.DisplayName = user.DisplayName
 		claims.Email = user.Email
 		claims.EmailVerified = user.EmailConfirmed
 		claims.OU = user.OU
-		claims.OUID = user.OUID
+		claims.OUID = user.OUId
 
 		jwt := NewJWT()
 		token, err := jwt.CreateToken(*claims)
@@ -181,10 +182,10 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 		_ = token
 
 	} else {
-		ctx.JSON(500, utils.SysResult{500, fmt.Sprintf("用户登录失败!"), loginParam.username})
+		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("用户%s登录失败!", loginParam.username), loginParam.username})
 		return
 	}
-	ctx.JSON(200, utils.SysResult{200, "", nil})
+	ctx.JSON(200, base.SysResult{200, "", nil})
 }
 
 // 新建一个jwt实例

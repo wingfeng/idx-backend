@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/wingfeng/backend/utils"
+	"github.com/wingfeng/idxadmin/base"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ type PermissionParam struct {
 }
 
 type PermissionController struct {
-	utils.BaseController
+	base.BaseController
 }
 
 func (ctrl *PermissionController) RegisterRouters(r *gin.RouterGroup) {
@@ -33,7 +33,7 @@ func (ctrl *PermissionController) CheckPermission(c *gin.Context) {
 func (ctrl *PermissionController) UpdateMenuPermission(context *gin.Context) {
 	var param PermissionParam
 	//	var param model.ModifyRole
-	e, _ := context.Get(utils.Const_CasbinKey)
+	e, _ := context.Get(base.Const_CasbinKey)
 	enf := e.(*casbin.Enforcer)
 	if err := context.ShouldBindJSON(&param); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -57,9 +57,9 @@ func (ctrl *PermissionController) UpdateMenuPermission(context *gin.Context) {
 		}
 	}
 	if err == nil {
-		context.JSON(http.StatusOK, utils.SysResult{200, "Success", nil})
+		context.JSON(http.StatusOK, base.SysResult{200, "Success", nil})
 	} else {
-		context.JSON(http.StatusInternalServerError, utils.SysResult{500, "Error", err})
+		context.JSON(http.StatusInternalServerError, base.SysResult{500, "Error", err})
 	}
 
 }
@@ -67,11 +67,11 @@ func (ctrl *PermissionController) UpdateMenuPermission(context *gin.Context) {
 // GetUserPermission 获取用户（或角色）具备的权限
 // @account 用户账号或者角色名称
 func (ctrl *PermissionController) GetUserPermission(c *gin.Context) {
-	e, _ := c.Get(utils.Const_CasbinKey)
+	e, _ := c.Get(base.Const_CasbinKey)
 	enf := e.(*casbin.Enforcer)
 	user := c.Query("account")
 	data := enf.GetPermissionsForUser(user)
-	c.JSON(http.StatusOK, utils.SysResult{
+	c.JSON(http.StatusOK, base.SysResult{
 		Code: 200,
 		Msg:  "Success",
 		Data: data,
