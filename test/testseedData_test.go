@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/magiconair/properties/assert"
-	idxutil "github.com/wingfeng/idx-oauth2/utils"
-	"github.com/wingfeng/idx/models"
 	"github.com/wingfeng/idxadmin/base"
 	systemmodels "github.com/wingfeng/idxadmin/system/models"
 )
@@ -33,101 +31,11 @@ func TestSeedData(t *testing.T) {
 	//初始化DB
 	context = GetBizContext()
 
-	ou := &models.OrganizationUnit{}
-	ou.Id = "1328680589330485248"
-	ou.Name = "XX软件"
-	ou.DisplayName = "XX软件有限公司"
-	db := context.DB()
-	err := db.Save(ou).Error
-	if err != nil {
-		panic(err)
-	}
-
-	user := &models.User{}
-	user.Id = "7a45cb54-b0ff-4ecd-95b9-074d33aaac1e"
-	user.Account = "admin"
-	user.DisplayName = "管理员"
-	user.Email = "admin@fire.loc"
-	user.OUId = ou.Id
-	user.OU = ou.DisplayName
-
-	user.PasswordHash, _ = idxutil.HashPassword("fire@123")
-	db = context.DB()
-	err = db.Save(user).Error
-	if err != nil {
-		panic(err)
-	}
-	role := &models.Role{}
-
-	role.Id = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43b"
-	role.Name = "SystemAdmin"
-	addRole(role)
-	addUserRole(user.Id, ou.Id, role.Id)
-	role = &models.Role{}
-
-	role.Id = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43c"
-	role.Name = "科室主任"
-	addRole(role)
-	addUserRole(user.Id, ou.Id, role.Id)
-
-	err = seedMenu()
+	err := seedMenu()
 	assert.Equal(t, nil, err)
-	client := &models.Client{
-		Id:                               1,
-		ClientId:                         "jsclient1",
-		Enabled:                          true,
-		ProtocolType:                     "oidc",
-		RequireSecret:                    false,
-		ClientName:                       "Javascript Client",
-		RequireConsent:                   true,
-		RedirectUris:                     "http://localhost:9000",
-		Scopes:                           "openid profile email api1 api2",
-		AllowRememberConsent:             true,
-		GrantTypes:                       "implicit",
-		AllowAccessTokensViaBrowser:      true,
-		BackChannelLogoutSessionRequired: true,
-		IdentityTokenLifetime:            300,
-		AccessTokenLifetime:              3600,
-		AbsoluteRefreshTokenLifetime:     2592000,
-		SlidingRefreshTokenLifetime:      2592000,
-		AuthorizationCodeLifetime:        300,
-		RefreshTokenUsage:                1,
-		RefreshTokenExpiration:           1,
-		ClientClaimsPrefix:               "client_",
-		DeviceCodeLifetime:               300,
-
-		EnableLocalLogin: true,
-		//UserSsoLifetime: , can be zero
-	}
-	db = context.DB()
-	db.Save(client)
-
-	if err != nil {
-		panic(err)
-	}
 
 }
 
-func addUserRole(uid, ouid, rid string) {
-	db := context.DB()
-	ur := &models.UserRoles{
-		RoleId: rid,
-		UserId: uid,
-		OUId:   ouid,
-	}
-	//联合主键的直接用engine来处理
-	err := db.Save(ur).Error
-	if err != nil {
-		panic(err)
-	}
-}
-func addRole(role *models.Role) {
-	db := context.DB()
-	err := db.Save(role).Error
-	if err != nil {
-		panic(err)
-	}
-}
 func seedMenu() error {
 	db := context.DB()
 	//node, err := snowflake.NewNode(1)
@@ -142,11 +50,11 @@ func seedMenu() error {
 	m.Icon = "menu_system2"
 	m.SortOrder = 10000
 
-	err := db.Save(m).Error
-	if err != nil {
-		return err
+	tx := db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
-
+	m = &systemmodels.MenuItem{}
 	m.ID = "1328680589439537153"
 	m.Path = "/1"
 	m.Name = "系统设置"
@@ -156,9 +64,9 @@ func seedMenu() error {
 	m.Parent = "1328680589439537152"
 	m.SortOrder = 10000
 
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 
 	//	context.Engine.ID("1328680589439537153").Get(m)
@@ -172,9 +80,9 @@ func seedMenu() error {
 	m.Component = "system/menu"
 	m.Parent = "1328680589439537153"
 	m.SortOrder = 10000
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 	//	context.Engine.ID("1328680589464702976").Get(m)
 
@@ -187,9 +95,9 @@ func seedMenu() error {
 	m.Component = "system/user"
 	m.Parent = "1328680589439537153"
 	m.SortOrder = 10000
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 	// m = &models.MenuItem{
 	// 	Path:      "/4",

@@ -47,3 +47,6 @@ page的用法
 `fitlers=windows.encodeURI("UserName like ?")`   
 args需要将每个参数用空格隔开  
 要注意使用数据库字段，而非json后的字段名称
+
+# Test
+docker run -d -p 5432:5432 --name postgresql -e POSTGRES_PASSWORD=pass@word1 postgres
