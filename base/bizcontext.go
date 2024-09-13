@@ -24,6 +24,8 @@ const (
 	const_ModifyerIDField = "UpdatorID"
 )
 
+var sqlDB *sql.DB
+
 type BizContext struct {
 	//UserID 当前用户ID
 	UserID string
@@ -56,6 +58,11 @@ func InitContext(driver string, connection string, user string, userId string, d
 	context.store = make(map[string]interface{})
 
 	engine := GetDB(driver, connection)
+
+	if engine == nil {
+		log.Error("数据库连接失败", "Driver", driver)
+		panic("数据库连接失败")
+	}
 	if dbLogger != nil {
 		engine.Logger = dbLogger
 	}
@@ -77,14 +84,16 @@ func (c *BizContext) Get(name string) interface{} {
 	obj := c.store[name]
 	return obj
 }
+
 func GetDB(driver string, connection string) *gorm.DB {
 	if strings.EqualFold(driver, "") {
 		driver = "mysql"
 	}
 	var err error
 	var x *gorm.DB
-
-	sqlDB, err := sql.Open(driver, connection)
+	if sqlDB == nil {
+		sqlDB, err = sql.Open(driver, connection)
+	}
 
 	switch driver {
 	case "mysql":
@@ -93,7 +102,7 @@ func GetDB(driver string, connection string) *gorm.DB {
 			Conn: sqlDB,
 		}), &gorm.Config{})
 
-	case "pgx":
+	case "pgx", "postgres":
 		x, err = gorm.Open(postgres.New(postgres.Config{
 			Conn: sqlDB,
 		}), &gorm.Config{})

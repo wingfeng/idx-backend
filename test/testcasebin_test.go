@@ -13,7 +13,7 @@ import (
 )
 
 func TestMenuPermission(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	model := &controller.PermissionParam{
@@ -38,7 +38,7 @@ func TestMenuPermission(t *testing.T) {
 	assert.Equal(t, w.Body.String(), "success")
 }
 func TestGetUserPermission(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/system/permission/getuserpermissions?account=fenggr", nil)

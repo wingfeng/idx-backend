@@ -1,6 +1,9 @@
-package test
+package oauth2
 
 import (
+	"github.com/wingfeng/idx/models"
+	"github.com/wingfeng/idxadmin/test"
+
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -8,24 +11,23 @@ import (
 	"testing"
 
 	"github.com/magiconair/properties/assert"
-	"github.com/wingfeng/idxadmin/system/models"
 )
 
 const (
-	category_path = "/api/v1/system/category/"
+	client_path = "/api/v1/system/client"
 )
 
-func TestSaveCategory(t *testing.T) {
-	router := SetupRouter()
+func TestSaveClient(t *testing.T) {
+	router := test.SetupRouter()
 
 	w := httptest.NewRecorder()
-	u := &models.Category{
-		ID: "1",
+	u := &models.Client{
+		Id: 1,
 	}
 	json, _ := json.Marshal(u)
 	strJson := string(json)
 	_ = strJson
-	req, _ := http.NewRequest("PUT", category_path, bytes.NewReader(json))
+	req, _ := http.NewRequest("PUT", client_path, bytes.NewReader(json))
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
@@ -34,11 +36,11 @@ func TestSaveCategory(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 
-func TestGetCategory(t *testing.T) {
-	router := SetupRouter()
+func TestGetClient(t *testing.T) {
+	router := test.SetupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", category_path+"get?id=1", nil)
+	req, _ := http.NewRequest("GET", client_path+"get?id=1", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, 200)
@@ -47,12 +49,12 @@ func TestGetCategory(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 
-func TestPageCategory(t *testing.T) {
-	router := SetupRouter()
+func TestPageClient(t *testing.T) {
+	router := test.SetupRouter()
 
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", category_path+"page?page=1&rows=10", nil)
+	req, _ := http.NewRequest("GET", client_path+"page?page=1&rows=10", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, 200)
@@ -60,11 +62,11 @@ func TestPageCategory(t *testing.T) {
 	t.Logf("Body:%v", bodyString)
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
-func TestDeleteCategory(t *testing.T) {
-	router := SetupRouter()
+func TestDeleteClient(t *testing.T) {
+	router := test.SetupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("DELETE", category_path+"del?id=3", nil)
+	req, _ := http.NewRequest("DELETE", client_path+"del?id=3", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, 200)

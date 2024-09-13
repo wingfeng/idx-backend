@@ -9,13 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wingfeng/idxadmin/base"
 	"github.com/wingfeng/idxadmin/rbac"
-	"github.com/wingfeng/idxadmin/routers"
+	"github.com/wingfeng/idxadmin/system"
 	"gorm.io/gorm/logger"
 )
 
 var route *gin.Engine
 
-func setupRouter() *gin.Engine {
+func SetupRouter() *gin.Engine {
 	if route == nil {
 		connection := "host=localhost port=5432 user=root password=pass@word1 dbname=idx sslmode=disable TimeZone=Asia/Shanghai"
 		//初始化DB
@@ -33,7 +33,7 @@ func setupRouter() *gin.Engine {
 			c.Set("casbin", enf)
 		})
 		fmt.Println("Hello World!")
-		routers.RegisterRouter(api)
+		system.RegisterRouter(api)
 	}
 
 	return route

@@ -47,13 +47,13 @@ type CustomClaims struct {
 
 type NewPassword struct {
 	ID           string `json:"id"`
-	OidPassword  string `json:"oidpassword"`
+	OldPassword  string `json:"oldpassword"`
 	PasswordHash string `json:"passwordhash"`
 }
 
 type userLogin struct {
-	username string `json:"username" binding:"required"`
-	password string `json:"password" binding:"required"`
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
 }
 
 func (ctrl *UserController) RegisterRouters(v1 *gin.RouterGroup) {
@@ -63,6 +63,7 @@ func (ctrl *UserController) RegisterRouters(v1 *gin.RouterGroup) {
 	v1.GET("/page", ctrl.Page)
 	v1.GET("/get", ctrl.Get)
 	v1.POST("/changepassword", ctrl.ChangePassword)
+	v1.POST("/login", ctrl.Login)
 	v1.GET("/Plaintext", ctrl.Plaintext)
 	v1.PUT("/update", ctrl.Update)
 }
@@ -116,7 +117,7 @@ func (ctrl *UserController) ChangePassword(ctx *gin.Context) {
 	}
 	//判断密码是否一致
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(u.OidPassword)); err == nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(u.OldPassword)); err == nil {
 		err = biz.DB().Model(&user).Updates(map[string]interface{}{"PasswordHash": u.PasswordHash, "IsTemporaryPassword": false}).Error
 		if err != nil {
 			ctx.JSON(500, base.SysResult{500, fmt.Sprintf("修改密码失败!"), u.ID})
@@ -150,22 +151,23 @@ func (ctrl *UserController) Update(c *gin.Context) {
 }
 func (ctrl *UserController) Login(ctx *gin.Context) {
 	var loginParam userLogin
-	err := ctx.BindJSON(&loginParam)
+	err := ctx.ShouldBind(&loginParam)
 	if err != nil {
-		ctx.JSON(400, base.SysResult{400, "绑定User对象错误!", err})
+		ctx.JSON(400, base.SysResult{Code: 400, Msg: "绑定User对象错误!", Data: err.Error()})
 		return
 	}
 	biz := ctrl.Prepare(ctx)
 	//获取要修改密码的用户信息
 	user := &models.User{}
-	err = biz.DB().Where("UserName = ?", loginParam.username).First(&user).Error
+	err = biz.DB().Where("account = ?", loginParam.Username).First(&user).Error
 	if err != nil {
-		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("用户%s登录失败!", loginParam.username), loginParam.username})
+		slog.Error("用户登录失败!", "username", loginParam.Username, "error", err.Error())
+		ctx.JSON(500, base.SysResult{Code: 500, Msg: fmt.Sprintf("用户%s登录失败!", loginParam.Username), Data: loginParam.Username})
 		return
 	}
 	//判断密码是否一致
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(loginParam.password)); err == nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(loginParam.Password)); err == nil {
 		claims := &CustomClaims{}
 		claims.Subject = user.Id
 		claims.DisplayName = user.DisplayName
@@ -179,13 +181,20 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		_ = token
+		ctx.JSON(200, gin.H{
+			"token": token,
+			"sub":   user.Id,
+			"name":  user.DisplayName,
+			"ou":    user.OU,
+			"email": user.Email,
+		})
+		return
 
 	} else {
-		ctx.JSON(500, base.SysResult{500, fmt.Sprintf("用户%s登录失败!", loginParam.username), loginParam.username})
+		ctx.JSON(401, base.SysResult{401, fmt.Sprintf("用户%s登录失败!", loginParam.Username), loginParam.Username})
 		return
 	}
-	ctx.JSON(200, base.SysResult{200, "", nil})
+
 }
 
 // 新建一个jwt实例

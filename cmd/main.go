@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/spf13/viper"
 	backend "github.com/wingfeng/idxadmin"
 
@@ -20,10 +21,7 @@ import (
 	"github.com/wingfeng/idxadmin/system/models"
 
 	"github.com/bwmarrin/snowflake"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/wingfeng/idxadmin/base"
 	_ "github.com/wingfeng/idxadmin/docs"
 )
@@ -109,22 +107,21 @@ func main() {
 
 	//初始化Gin
 	route := gin.Default()
-	route.Static("/", "../front/dist")
+	// route.Static("/", "../front/dist")
 
 	route.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:9000", "http://192.168.0.106:8080", "http://192.168.0.101:8080"},
+		AllowOrigins:     []string{"http://localhost:5666", "http://192.168.0.101:8080"},
 		AllowMethods:     []string{"*", "PUT", "DELETE", "GET", "POST"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
 		//	MaxAge:           12 * time.Hour,
 	}))
-	group := route.Group("/api")
+
 	option := opts.EntryOption
 
-	option.Group = group
-	backend.Init(option)
+	backend.Init(option, route)
 
-	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	//	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	node, _ := snowflake.NewNode(1)
 	fmt.Printf("程序实例启动 %v\r\n", node.Generate())
 	route.Run(fmt.Sprintf("%s:%d", opts.IP, opts.Port))

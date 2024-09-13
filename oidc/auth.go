@@ -33,7 +33,7 @@ type UserInfo struct {
 	Profile       string          `json:"profile"`
 	Email         string          `json:"email"`
 	EmailVerified bool            `json:"email_verified"`
-	Roles         json.RawMessage `json:"role,omitempty"`
+	Roles         json.RawMessage `json:"roles,omitempty"`
 	PreferedName  json.RawMessage `json:"preferred_username,omitempty"`
 	Name          string          `json:"name"`
 	OU            string
@@ -59,6 +59,10 @@ func Init(issuer string, userInfoEndpoint string) {
 // AuthWare 通过OpenID的JWT验证客户身份
 func AuthWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if !strings.Contains(c.Request.URL.Path, "/api/v1/system/login") {
+			c.Next()
+			return
+		}
 		authHeader := c.GetHeader("Authorization")
 
 		token, err := verifyHeader(authHeader)
@@ -182,7 +186,7 @@ func extractClaims(tokenStr string) (jwt.MapClaims, error) {
 	})
 
 	if err != nil {
-		slog.Error("解析JWT失败!", zap.Error(err))
+		slog.Error("解析JWT失败!", "error", err.Error())
 		return nil, err
 	}
 

@@ -51,7 +51,7 @@ func TestSeedData(t *testing.T) {
 	user.OUId = ou.Id
 	user.OU = ou.DisplayName
 
-	user.PasswordHash, _ = idxutil.HashPassword("fire@123")
+	user.PasswordHash, _ = idxutil.HashPassword("password1")
 	db = context.DB()
 	err = db.Save(user).Error
 	if err != nil {
@@ -72,35 +72,6 @@ func TestSeedData(t *testing.T) {
 
 	err = seedMenu()
 	assert.Equal(t, nil, err)
-	client := &models.Client{
-		Id:                               1,
-		ClientId:                         "jsclient1",
-		Enabled:                          true,
-		ProtocolType:                     "oidc",
-		RequireSecret:                    false,
-		ClientName:                       "Javascript Client",
-		RequireConsent:                   true,
-		RedirectUris:                     "http://localhost:9000",
-		Scopes:                           "openid profile email api1 api2",
-		AllowRememberConsent:             true,
-		GrantTypes:                       "implicit",
-		AllowAccessTokensViaBrowser:      true,
-		BackChannelLogoutSessionRequired: true,
-		IdentityTokenLifetime:            300,
-		AccessTokenLifetime:              3600,
-		AbsoluteRefreshTokenLifetime:     2592000,
-		SlidingRefreshTokenLifetime:      2592000,
-		AuthorizationCodeLifetime:        300,
-		RefreshTokenUsage:                1,
-		RefreshTokenExpiration:           1,
-		ClientClaimsPrefix:               "client_",
-		DeviceCodeLifetime:               300,
-
-		EnableLocalLogin: true,
-		//UserSsoLifetime: , can be zero
-	}
-	db = context.DB()
-	db.Save(client)
 
 	if err != nil {
 		panic(err)

@@ -20,7 +20,7 @@ const (
 )
 
 func TestGetUser(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/system/user/get?id=7a45cb54-b0ff-4ecd-95b9-074d33aaac1e", nil)
@@ -32,7 +32,7 @@ func TestGetUser(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestSaveUser(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	u := &models.User{
@@ -63,7 +63,7 @@ func TestSaveUser(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestDeleteUser(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", userpath+"del?id=5fae682fffd13d74352be0a9", nil)
@@ -75,7 +75,7 @@ func TestDeleteUser(t *testing.T) {
 	assert.Equal(t, len(bodyString) > 0, true)
 }
 func TestPageUser(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	filters := "UserName like ? and id=?"

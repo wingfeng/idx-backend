@@ -16,7 +16,7 @@ const (
 )
 
 func TestGetOptionSet(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", optionset_path+"get?id=10863943-e7cf-41a9-acf2-8bb33ab39960", nil)
@@ -28,7 +28,7 @@ func TestGetOptionSet(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestSaveOptionSet(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	u := &models.OptionSet{
@@ -50,7 +50,7 @@ func TestSaveOptionSet(t *testing.T) {
 }
 
 func TestPageOptionSet(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 
@@ -63,7 +63,7 @@ func TestPageOptionSet(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestDeleteOptionSet(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", optionset_path+"del?id=10863943-e7cf-41a9-acf2-8bb33ab39960", nil)

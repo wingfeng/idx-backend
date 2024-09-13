@@ -17,7 +17,7 @@ const (
 )
 
 func TestGetUserRoles(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", userroles_path+"get?id=1", nil)
@@ -29,7 +29,7 @@ func TestGetUserRoles(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestSaveUserRoles(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	u := &models.UserRoles{
@@ -50,7 +50,7 @@ func TestSaveUserRoles(t *testing.T) {
 }
 
 func TestPageUserRoles(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 
@@ -63,7 +63,7 @@ func TestPageUserRoles(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestDeleteUserRoles(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", userroles_path+"del?id=3", nil)

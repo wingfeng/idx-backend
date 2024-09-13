@@ -13,7 +13,7 @@ const (
 )
 
 func TestGetUtilsRoles(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", utilsroles_path+"get", nil)

@@ -1,4 +1,4 @@
-package routers
+package system
 
 import (
 	"github.com/wingfeng/idxadmin/base"

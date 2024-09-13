@@ -4,165 +4,167 @@ import "strings"
 
 type Page struct {
 	//记录总数
-	Counts int64 `json:"totalSize" `
+	Counts int64 `json:"total" `
 	//每页显示记录数
-	PageSize int64 `json:"rows" form:"rows"`
+	PageSize int64 `json:"pageSize" form:"pageSize"`
 	//总页数
-	TotalPage int64           `json:"totalPageSize"`
+	TotalPage int64           `json:"totalPages"`
 	Cols      map[string]bool `form:"cols"`
 	//当前页
-	CurPage int64  `json:"page" form:"page"`
+	CurPage int64 `json:"page" form:"page"`
+	//以field:operator的形势拼接，如：field1:like,field2:eq， Operator:eq,like,gt,lt,ge,le
 	Filters string `form:"filters"`
-	Args    string `form:"args"`
+	//多个参数用分号分隔 如: 内容1;内容2;
+	Args string `form:"args"`
 	//页面显示开始记录数
 	FirstResult int64
 	//页面显示最后记录数
 	LastResult int64
 	//排序类型
-	OrderType string `form:"ordertype"`
+	OrderType string `form:"sortOrder"`
 	//排序名称
-	OrderName string      `form:"ordername"`
-	Data      interface{} `json:"content"`
+	OrderName string      `form:"sortField"`
+	Data      interface{} `json:"list"`
 }
 
-func (this *Page) Build(counts int64, pageSize int64) {
-	this.Counts = counts
-	this.PageSize = pageSize
+func (p *Page) Build(counts int64, pageSize int64) {
+	p.Counts = counts
+	p.PageSize = pageSize
 	if counts%pageSize == 0 {
-		this.TotalPage = this.Counts / this.PageSize
+		p.TotalPage = p.Counts / p.PageSize
 	} else {
-		this.TotalPage = this.Counts/this.PageSize + 1
+		p.TotalPage = p.Counts/p.PageSize + 1
 	}
 }
 
-func (this *Page) GetCounts() int64 {
-	return this.Counts
+func (p *Page) GetCounts() int64 {
+	return p.Counts
 }
 
 /**
  *  Counts
  *            the Counts to set
  */
-func (this *Page) SetCounts(counts int64) {
+func (p *Page) SetCounts(counts int64) {
 	// 计算所有的页面数
-	this.Counts = counts
-	// this.TotalPage = (int)Math.ceil((this.Counts + this.perPageSize - 1)
-	// / this.perPageSize)
-	if counts%this.PageSize == 0 {
-		this.TotalPage = this.Counts / this.PageSize
+	p.Counts = counts
+	// p.TotalPage = (int)Math.ceil((p.Counts + p.perPageSize - 1)
+	// / p.perPageSize)
+	if counts%p.PageSize == 0 {
+		p.TotalPage = p.Counts / p.PageSize
 	} else {
-		this.TotalPage = this.Counts/this.PageSize + 1
+		p.TotalPage = p.Counts/p.PageSize + 1
 	}
 }
 
-func (this *Page) GetPageSize() int64 {
-	return this.PageSize
+func (p *Page) GetPageSize() int64 {
+	return p.PageSize
 }
 
-func (this *Page) SetPageSize(pageSize int64) {
-	this.PageSize = pageSize
+func (p *Page) SetPageSize(pageSize int64) {
+	p.PageSize = pageSize
 }
 
 /**
  *  the TotalPage
  */
-func (this *Page) GetTotalPage() int64 {
-	if this.TotalPage < 1 {
+func (p *Page) GetTotalPage() int64 {
+	if p.TotalPage < 1 {
 		return 1
 	}
-	return this.TotalPage
+	return p.TotalPage
 }
 
 /**
  *  TotalPage
  *            the TotalPage to set
  */
-func (this *Page) SetTotalPage(totalPage int64) {
-	this.TotalPage = totalPage
+func (p *Page) SetTotalPage(totalPage int64) {
+	p.TotalPage = totalPage
 }
 
-func (this *Page) GetCurPage() int64 {
-	return this.CurPage
+func (p *Page) GetCurPage() int64 {
+	return p.CurPage
 }
 
-func (this *Page) SetCurPage(curPage int64) {
-	this.CurPage = curPage
+func (p *Page) SetCurPage(curPage int64) {
+	p.CurPage = curPage
 }
 
 /**
  *  the FirstResult
  */
-func (this *Page) GetFirstResult() int64 {
-	temp := this.CurPage - 1
+func (p *Page) GetFirstResult() int64 {
+	temp := p.CurPage - 1
 	if temp <= 0 {
 		return 0
 	}
-	this.FirstResult = (this.CurPage - 1) * this.PageSize
-	return this.FirstResult
+	p.FirstResult = (p.CurPage - 1) * p.PageSize
+	return p.FirstResult
 }
 
 /**
  *  FirstResult
  *            the FirstResult to set
  */
-func (this *Page) SetFirstResult(firstResult int64) {
-	this.FirstResult = firstResult
+func (p *Page) SetFirstResult(firstResult int64) {
+	p.FirstResult = firstResult
 }
 
 /**
  *  the LastResult
  */
-func (this *Page) GetLastResult() int64 {
-	this.LastResult = this.FirstResult + this.PageSize
-	return this.LastResult
+func (p *Page) GetLastResult() int64 {
+	p.LastResult = p.FirstResult + p.PageSize
+	return p.LastResult
 }
 
 /**
  *  LastResult
  *            the LastResult to set
  */
-func (this *Page) SetLastResult(lastResult int64) {
-	this.LastResult = lastResult
+func (p *Page) SetLastResult(lastResult int64) {
+	p.LastResult = lastResult
 }
 
 /**
  *  the OrderName
  */
-func (this *Page) GetOrderName() string {
-	return this.OrderName
+func (p *Page) GetOrderName() string {
+	return p.OrderName
 }
 
 /**
  *  OrderName
  *            the OrderName to set
  */
-func (this *Page) SetOrderName(orderName string) {
-	this.OrderName = orderName
+func (p *Page) SetOrderName(orderName string) {
+	p.OrderName = orderName
 }
 
 /**
  *  the orderBy
  */
-func (this *Page) getOrderType() string {
-	return this.OrderType
+func (p *Page) getOrderType() string {
+	return strings.TrimSuffix(p.OrderType, "end")
 }
 
 /**
  *  orderBy
  *            the orderBy to set
  */
-func (this *Page) SetOrderType(orderType string) {
-	this.OrderType = orderType
+func (p *Page) SetOrderType(orderType string) {
+	p.OrderType = orderType
 }
 
 /**
  *  the orderBy
  */
-func (this *Page) GetOrderBy() string {
-	if len(this.GetOrderName()) <= 0 {
+func (p *Page) GetOrderBy() string {
+	if len(p.GetOrderName()) <= 0 {
 		return ""
 	}
-	orderBy := this.GetOrderName() + " " + this.getOrderType()
+	orderBy := p.GetOrderName() + " " + p.getOrderType()
 	return orderBy
 }
 

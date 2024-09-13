@@ -17,7 +17,7 @@ const (
 )
 
 func TestMenu(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/system/sidebar", nil)
@@ -30,7 +30,7 @@ func TestMenu(t *testing.T) {
 }
 
 func TestSaveMenu(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	u := &models.MenuItem{

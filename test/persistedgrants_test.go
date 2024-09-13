@@ -13,7 +13,7 @@ const (
 )
 
 func TestGetPersistedGrants(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", persistedgrants_path+"get?id=1", nil)
@@ -26,7 +26,7 @@ func TestGetPersistedGrants(t *testing.T) {
 }
 
 func TestPagePersistedGrants(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 
@@ -39,7 +39,7 @@ func TestPagePersistedGrants(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestDeletePersistedGrants(t *testing.T) {
-	router := setupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", persistedgrants_path+"del?id=3", nil)
