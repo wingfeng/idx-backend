@@ -88,10 +88,10 @@ func main() {
 	}
 	if *gen {
 		slog.Info("Beging generate controller and test")
-		row := idxmodels.Client{}
-		genController(row, "", "oauth2")
-		// apiRow := models.APIResources{}
-		// genController(apiRow, "")
+		// row := idxmodels.Client{}
+		// genController(row, "", "oauth2")
+		apiRow := idxmodels.APIResources{}
+		genController(apiRow, "", "oauth2")
 		// grant := models.PersistedGrants{}
 		// genController(grant, "")
 		// clientsecrets := models.ClientSecrets{}
@@ -142,7 +142,7 @@ func genController(row interface{}, shortName string, module string) {
 		LowerShortName: strings.ToLower(shortName),
 	}
 	o := fmt.Sprintf("../%s/controller/%scontroller.go", module, shortName)
-	otest := fmt.Sprintf("../test/%s/%s_test.go", module, shortName)
+	otest := fmt.Sprintf("../test/%s_%s_test.go", module, shortName)
 	err := os.MkdirAll(path.Join("..", module, "controller"), fs.ModeAppend)
 	os.MkdirAll(path.Join("..", "test", module), fs.ModeAppend)
 	if err != nil {
