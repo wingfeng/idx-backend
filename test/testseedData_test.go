@@ -118,11 +118,11 @@ func seedMenu() error {
 	m.Icon = "menu_system2"
 	m.SortOrder = 10000
 
-	err := db.Save(m).Error
-	if err != nil {
-		return err
+	tx := db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
-
+	m = &systemmodels.MenuItem{}
 	m.ID = "1328680589439537153"
 	m.Path = "/1"
 	m.Name = "系统设置"
@@ -132,9 +132,9 @@ func seedMenu() error {
 	m.Parent = "1328680589439537152"
 	m.SortOrder = 10000
 
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 
 	//	context.Engine.ID("1328680589439537153").Get(m)
@@ -148,9 +148,9 @@ func seedMenu() error {
 	m.Component = "system/menu"
 	m.Parent = "1328680589439537153"
 	m.SortOrder = 10000
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 	//	context.Engine.ID("1328680589464702976").Get(m)
 
@@ -163,9 +163,9 @@ func seedMenu() error {
 	m.Component = "system/user"
 	m.Parent = "1328680589439537153"
 	m.SortOrder = 10000
-	err = db.Save(m).Error
-	if err != nil {
-		return err
+	tx = db.Save(m)
+	if tx.Error != nil || tx.RowsAffected == 0 {
+		return tx.Error
 	}
 	// m = &models.MenuItem{
 	// 	Path:      "/4",
@@ -188,6 +188,6 @@ func seedMenu() error {
 	m.Component = "home/default"
 	m.Parent = ""
 	m.SortOrder = -1
-	err = db.Save(m).Error
+	err := db.Save(m).Error
 	return err
 }
