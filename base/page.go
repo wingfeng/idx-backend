@@ -1,6 +1,11 @@
 package base
 
-import "strings"
+import (
+	"errors"
+	"fmt"
+	"regexp"
+	"strings"
+)
 
 type Page struct {
 	//记录总数
@@ -12,18 +17,18 @@ type Page struct {
 	Cols      map[string]bool `form:"cols"`
 	//当前页
 	CurPage int64 `json:"page" form:"page"`
-	//以field:operator的形势拼接，如：field1:like,field2:eq， Operator:eq,like,gt,lt,ge,le
-	Filters string `form:"filters"`
+	//过滤条件过滤条件只支持'field operator ?'格式
+	Filters []string `json:"filters"`
 	//多个参数用分号分隔 如: 内容1;内容2;
-	Args string `form:"args"`
+	Args []string `json:"args"`
 	//页面显示开始记录数
 	FirstResult int64
 	//页面显示最后记录数
 	LastResult int64
 	//排序类型
-	OrderType string `form:"sortOrder"`
+	SortOrder string `json:"sortOrder"`
 	//排序名称
-	OrderName string      `form:"sortField"`
+	SortField string      `json:"sortField"`
 	Data      interface{} `json:"list"`
 }
 
@@ -128,62 +133,57 @@ func (p *Page) SetLastResult(lastResult int64) {
 }
 
 /**
- *  the OrderName
- */
-func (p *Page) GetOrderName() string {
-	return p.OrderName
-}
-
-/**
- *  OrderName
- *            the OrderName to set
- */
-func (p *Page) SetOrderName(orderName string) {
-	p.OrderName = orderName
-}
-
-/**
  *  the orderBy
  */
 func (p *Page) getOrderType() string {
-	return strings.TrimSuffix(p.OrderType, "end")
-}
-
-/**
- *  orderBy
- *            the orderBy to set
- */
-func (p *Page) SetOrderType(orderType string) {
-	p.OrderType = orderType
+	return strings.TrimSuffix(p.SortOrder, "end")
 }
 
 /**
  *  the orderBy
  */
 func (p *Page) GetOrderBy() string {
-	if len(p.GetOrderName()) <= 0 {
+	if len(p.SortField) <= 0 {
 		return ""
 	}
-	orderBy := p.GetOrderName() + " " + p.getOrderType()
+	orderBy := p.SortField + " " + p.getOrderType()
 	return orderBy
 }
 
-// func (p *Page) GetFilters() (string, error) {
-// 	if len(p.Filters) < 1 {
-// 		return "", nil
-// 	}
-// 	result, err := url.QueryUnescape(p.Filters)
-// 	return string(result), err
-// }
-func (p *Page) GetArgs() []interface{} {
-	if len(p.Args) < 1 {
-		return nil
+func (p *Page) ValidateFilters() error {
+	pattern := `^[a-zA-Z_][a-zA-Z0-9_]*$`
+	supportedOperators := map[string]bool{
+		"=":    true,
+		"!=":   true,
+		">":    true,
+		"<":    true,
+		">=":   true,
+		"<=":   true,
+		"like": true,
+		"in":   true,
+	}
+	compiledPattern, _ := regexp.Compile(pattern)
+	for _, filter := range p.Filters {
+		if strings.LastIndex(filter, "?") != len(filter)-1 {
+			return errors.New("? must be at the end of filter")
+		}
+		tmp := strings.Split(filter, " ")
+		if len(tmp) != 3 {
+			return errors.New("filter format error, only support 'field operator ?' pattern")
+		}
+		field := tmp[0]
+
+		//通过正则表达时校验field是否符合数据库字段格式
+		matched := compiledPattern.MatchString(field)
+		if !matched {
+			return fmt.Errorf("field name %s format error", field)
+		}
+		op := tmp[1]
+		if !supportedOperators[op] {
+			return fmt.Errorf("operator %s not supported", op)
+		}
+
 	}
 
-	sResult := strings.Split(p.Args, " ")
-	result := make([]interface{}, 0)
-	for _, s := range sResult {
-		result = append(result, s)
-	}
-	return result
+	return nil
 }

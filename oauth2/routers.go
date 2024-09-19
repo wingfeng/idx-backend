@@ -13,6 +13,8 @@ func RegisterRouter(api *gin.RouterGroup) {
 	ctrls := make(map[string]base.Controller)
 	ctrl := &controller.ClientController{}
 	ctrls["client"] = ctrl
+	apiCtrl := &controller.APIResourcesController{}
+	ctrls["api"] = apiCtrl
 	for c, ctrl := range ctrls {
 		g := api.Group(c)
 		ctrl.RegisterRouters(g)

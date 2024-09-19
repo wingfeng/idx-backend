@@ -130,10 +130,18 @@ func (context *BizContext) Page(rows interface{}, page *Page) error {
 
 	filters := page.Filters
 
-	args := page.GetArgs()
+	args := page.Args
 
-	if !strings.EqualFold(filters, "") {
-		db = db.Where(filters, args...)
+	if len(filters) > 0 {
+		err = page.ValidateFilters()
+		if err != nil {
+			return err
+		}
+		for i, f := range filters {
+			arg := args[i]
+			db = db.Where(f, arg)
+		}
+
 	}
 	err = db.Count(&counts).Error
 	if nil != err {
@@ -175,10 +183,18 @@ func (context *BizContext) PageComplex(db *gorm.DB, page *Page) error {
 
 	filters := page.Filters
 
-	args := page.GetArgs()
+	args := page.Args
 
-	if !strings.EqualFold(filters, "") {
-		db = db.Where(filters, args...)
+	if len(filters) > 0 {
+		err = page.ValidateFilters()
+		if err != nil {
+			return err
+		}
+		for i, f := range filters {
+			arg := args[i]
+			db = db.Where(f, arg)
+		}
+
 	}
 	err = db.Count(&counts).Error
 	if nil != err {

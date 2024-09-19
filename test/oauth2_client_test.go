@@ -1,8 +1,7 @@
-package oauth2
+package test
 
 import (
 	"github.com/wingfeng/idx/models"
-	"github.com/wingfeng/idxadmin/test"
 
 	"bytes"
 	"encoding/json"
@@ -18,7 +17,7 @@ const (
 )
 
 func TestSaveClient(t *testing.T) {
-	router := test.SetupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	u := &models.Client{
@@ -37,7 +36,7 @@ func TestSaveClient(t *testing.T) {
 }
 
 func TestGetClient(t *testing.T) {
-	router := test.SetupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", client_path+"get?id=1", nil)
@@ -50,7 +49,7 @@ func TestGetClient(t *testing.T) {
 }
 
 func TestPageClient(t *testing.T) {
-	router := test.SetupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 
@@ -63,7 +62,7 @@ func TestPageClient(t *testing.T) {
 	assert.Equal(t, len(w.Body.String()) > 0, true)
 }
 func TestDeleteClient(t *testing.T) {
-	router := test.SetupRouter()
+	router := SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", client_path+"del?id=3", nil)

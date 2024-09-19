@@ -70,6 +70,11 @@ func TestSeedData(t *testing.T) {
 	addRole(role)
 	addUserRole(user.Id, ou.Id, role.Id)
 
+	role = &models.Role{}
+	role.Id = "d4d1a7f6-9f33-4ed6-a320-df3754c6e43d"
+	role.Name = "admin"
+	addRole(role)
+	addUserRole(user.Id, ou.Id, role.Id)
 	err = seedMenu()
 	assert.Equal(t, nil, err)
 

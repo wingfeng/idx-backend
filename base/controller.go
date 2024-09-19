@@ -105,6 +105,10 @@ func (ctrl *BaseController) Page(rows interface{}, c *gin.Context) {
 		Data:     rows,
 	}
 	err := c.ShouldBind(p)
+	if err != nil {
+		c.JSON(500, SysResult{500, "Error", err.Error()})
+		return
+	}
 	biz := ctrl.Prepare(c)
 
 	err = biz.Page(rows, p)
