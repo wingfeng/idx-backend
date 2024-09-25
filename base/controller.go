@@ -30,7 +30,7 @@ func (ctrl *BaseController) Save(row interface{}, c *gin.Context) {
 
 	err := c.BindJSON(row)
 	if err != nil {
-		slog.Error("绑定User对象错误!,%v", "error", err.Error())
+		slog.Error("绑定row对象错误!,%v", "error", err.Error())
 		c.AbortWithError(500, err)
 		return
 	}

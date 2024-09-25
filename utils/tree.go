@@ -23,7 +23,7 @@ func BuildMenuTree(items interface{}) []interface{} {
 		it := ti.(TreeItem)
 
 		p := it.ParentID()
-		if strings.EqualFold("", p.(string)) || p == int64(0) {
+		if p == nil || strings.EqualFold("", p.(string)) || p == int64(0) {
 			roots = append(roots, it)
 		}
 

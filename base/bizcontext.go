@@ -38,7 +38,7 @@ type BizContext struct {
 
 	db       *gorm.DB
 	Enforcer *casbin.Enforcer
-	node     snowflake.Node
+	node     *snowflake.Node
 	store    map[string]interface{}
 }
 
@@ -74,7 +74,7 @@ func InitContext(driver string, connection string, user string, userId string, d
 	if err != nil {
 		slog.Error("创建ID生成器失败")
 	}
-	context.node = *node
+	context.node = node
 	return context
 }
 func (c *BizContext) Set(name string, obj interface{}) {

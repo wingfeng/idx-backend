@@ -22,7 +22,7 @@ type EntryOption struct {
 	UserEndpoint string
 }
 
-func Init(option EntryOption, route gin.IRouter) {
+func Init(option *EntryOption, route gin.IRouter) {
 
 	//初始化Casbin RBAC
 	enf := rbac.InitEnforcer(option.Driver, option.Connection, option.PolicyPath)

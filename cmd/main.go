@@ -67,12 +67,15 @@ func main() {
 
 	opts := &Opts{}
 	err = viper.Unmarshal(opts)
+	if err != nil {
+		slog.Error("读取配置错误:", "error", err)
+	}
 	entryOption := &backend.EntryOption{}
 
 	err = viper.Unmarshal(entryOption)
-	opts.EntryOption = *entryOption
+	// opts.EntryOption = entryOption
 	if err != nil {
-		slog.Error("读取配置错误:", err)
+		slog.Error("读取配置错误:", "error", err)
 	}
 
 	driver := opts.Driver
@@ -107,27 +110,38 @@ func main() {
 
 	//初始化Gin
 	route := gin.Default()
+
 	// route.Static("/", "../front/dist")
 
 	route.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5666", "http://192.168.0.101:8080"},
-		AllowMethods:     []string{"*", "PUT", "DELETE", "GET", "POST"},
-		AllowHeaders:     []string{"*"},
+		AllowOrigins: []string{"http://localhost:5666", "http://192.168.0.101:8080"},
+		AllowMethods: []string{"PUT", "DELETE", "GET", "POST"},
+		//	AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
 		//	MaxAge:           12 * time.Hour,
 	}))
 
-	option := opts.EntryOption
-
-	backend.Init(option, route)
+	backend.Init(entryOption, route)
 
 	//	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	node, _ := snowflake.NewNode(1)
 	fmt.Printf("程序实例启动 %v\r\n", node.Generate())
+	loadFrontend(route)
 	route.Run(fmt.Sprintf("%s:%d", opts.IP, opts.Port))
 
 }
-
+func loadFrontend(router *gin.Engine) {
+	fil := "C:\\workspace\\gowork\\vue-vben-admin\\apps\\web-antd\\dist"
+	router.Static("/front", fil)
+	router.GET("/front", func(c *gin.Context) {
+		p := path.Join(fil, "index.html")
+		c.File(p)
+	})
+	router.NoRoute(func(c *gin.Context) {
+		p := path.Join(fil, "index.html")
+		c.File(p)
+	})
+}
 func genController(row interface{}, shortName string, module string) {
 	tp := reflect.TypeOf(row)
 

@@ -60,7 +60,7 @@ func (ctrl *UserController) RegisterRouters(v1 *gin.RouterGroup) {
 
 	v1.PUT(".", ctrl.Save)
 	v1.DELETE("/del", ctrl.Delete)
-	v1.GET("/page", ctrl.Page)
+	v1.POST("/page", ctrl.Page)
 	v1.GET("/get", ctrl.Get)
 	v1.POST("/changepassword", ctrl.ChangePassword)
 	v1.POST("/login", ctrl.Login)

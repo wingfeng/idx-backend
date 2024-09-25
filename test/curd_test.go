@@ -12,7 +12,7 @@ func TestBizContext_PageComplex(t *testing.T) {
 	db := context.DB().Table("users").Select("users.*,org.display_name").Joins("join organization_units as org on users.ou_id=org.id").Where("users.account='admin'")
 	//	data := make(map[string]interface{}, 0)
 	page := &base.Page{
-		Filters:  "",
+		Filters:  []string{""},
 		PageSize: 10,
 		CurPage:  1,
 		//	Data:     data,
