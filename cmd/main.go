@@ -131,7 +131,7 @@ func main() {
 
 }
 func loadFrontend(router *gin.Engine) {
-	fil := "C:\\workspace\\gowork\\vue-vben-admin\\apps\\web-antd\\dist"
+	fil := "../front/"
 	router.Static("/front", fil)
 	router.GET("/front", func(c *gin.Context) {
 		p := path.Join(fil, "index.html")

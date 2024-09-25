@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/wingfeng/idxadmin/utils"
@@ -122,7 +123,7 @@ func (ctrl *BaseController) Page(rows interface{}, c *gin.Context) {
 
 func (ctrl *BaseController) GeneratID(c *gin.Context) {
 	id := utils.GeneratID()
-	idMap := make(map[string]string)
+	idMap := make(map[string]snowflake.ID)
 	idMap["id"] = id
 	c.JSON(200, SysResult{200, "", idMap})
 }

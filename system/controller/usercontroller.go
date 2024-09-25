@@ -169,12 +169,12 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.GetPasswordHash()), []byte(loginParam.Password)); err == nil {
 		claims := &CustomClaims{}
-		claims.Subject = user.Id
+		claims.Subject = user.Id.String()
 		claims.DisplayName = user.DisplayName
 		claims.Email = user.Email
 		claims.EmailVerified = user.EmailConfirmed
 		claims.OU = user.OU
-		claims.OUID = user.OUId
+		claims.OUID = user.OUId.String()
 
 		jwt := NewJWT()
 		token, err := jwt.CreateToken(*claims)
