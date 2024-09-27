@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/fs"
 	"log/slog"
+	"mime"
 	"os"
 	"path"
 	"reflect"
@@ -132,6 +133,9 @@ func main() {
 }
 func loadFrontend(router *gin.Engine) {
 	fil := "../front/"
+	mime.AddExtensionType(".js", "application/javascript")
+	mime.AddExtensionType(".css", "text/css")
+	mime.AddExtensionType(".mjs", "application/javascript")
 	router.Static("/front", fil)
 	router.GET("/front", func(c *gin.Context) {
 		p := path.Join(fil, "index.html")
