@@ -21,8 +21,9 @@ func TestSaveClient(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u := &models.Client{
-		Id: 1,
+		ClientId: "testId",
 	}
+	u.Id = 1838872840128958465
 	json, _ := json.Marshal(u)
 	strJson := string(json)
 	_ = strJson

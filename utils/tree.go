@@ -1,8 +1,8 @@
 package utils
 
 import (
+	"errors"
 	"reflect"
-	"strings"
 )
 
 type TreeItem interface {
@@ -11,10 +11,11 @@ type TreeItem interface {
 	SetChildren(children []interface{})
 }
 
-func BuildMenuTree(items interface{}) []interface{} {
-	var roots []TreeItem
-	roots = make([]TreeItem, 0)
-
+func ConvertToTreeSlice(items interface{}) ([]TreeItem, error) {
+	result := make([]TreeItem, 0)
+	if reflect.ValueOf(items).Kind() != reflect.Slice { //判断是否为slice
+		return result, errors.New("items is not slice")
+	}
 	sliceItems := reflect.ValueOf(items)
 	for i := 0; i < sliceItems.Len(); i++ {
 		item := sliceItems.Index(i)
@@ -22,23 +23,29 @@ func BuildMenuTree(items interface{}) []interface{} {
 		ti := item.Addr().Interface()
 		it := ti.(TreeItem)
 
+		result = append(result, it)
+
+	}
+	return result, nil
+}
+func BuildTree(items []TreeItem) []interface{} {
+	var roots []TreeItem
+	roots = make([]TreeItem, 0)
+
+	for _, it := range items {
+
 		p := it.ParentID()
-		if p == nil || strings.EqualFold("", p.(string)) || p == int64(0) {
+		if p == nil {
 			roots = append(roots, it)
 		}
 
 	}
-	// linq.From(siceItems).WhereT(func(i TreeItem) bool {
-	// 	return i.ParentID() == 0
-	// }).ToSlice(&roots)
 
 	result := make([]interface{}, 0)
 
 	for _, item := range roots {
 		id := item.GetID()
-		if strings.EqualFold("", id.(string)) || id == int64(0) {
-			continue
-		}
+
 		deep := 0
 		children := getChildren(id, items, &deep)
 		item.SetChildren(children)
@@ -46,18 +53,14 @@ func BuildMenuTree(items interface{}) []interface{} {
 	}
 	return result
 }
-func getChildren(id interface{}, items interface{}, deep *int) []interface{} {
+func getChildren(id interface{}, items []TreeItem, deep *int) []interface{} {
 	*deep++
 	if *deep > 20 { //防止死循环，树的层次最多20层
 		return make([]interface{}, 0)
 	}
 	var children []TreeItem
-	sliceItems := reflect.ValueOf(items)
-	for i := 0; i < sliceItems.Len(); i++ {
-		item := sliceItems.Index(i)
 
-		ti := item.Addr().Interface()
-		it := ti.(TreeItem)
+	for _, it := range items {
 
 		p := it.ParentID()
 		if p == id {

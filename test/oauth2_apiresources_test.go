@@ -20,9 +20,8 @@ func TestSaveAPIResources(t *testing.T) {
 	router := SetupRouter()
 
 	w := httptest.NewRecorder()
-	u := &models.APIResources{
-		Id: 1,
-	}
+	u := &models.APIResources{}
+	u.Id = 1
 	json, _ := json.Marshal(u)
 	strJson := string(json)
 	_ = strJson

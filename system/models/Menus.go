@@ -31,6 +31,9 @@ type MenuItem struct {
 //		return "Menus"
 //	}
 func (m *MenuItem) ParentID() interface{} {
+	if strings.EqualFold(m.Parent, "") {
+		return nil
+	}
 	return m.Parent
 }
 func (m *MenuItem) SetID(id interface{}) {

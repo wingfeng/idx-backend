@@ -19,9 +19,8 @@ func TestSave{{.ShortName}}(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
-	u := &{{.Type}}{
-		Id:             "1",	
-	}
+	u := &{{.Type}}{}
+	u.Id = 1
 	json, _ := json.Marshal(u)
 	strJson := string(json)
 	_ = strJson

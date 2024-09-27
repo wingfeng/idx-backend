@@ -52,7 +52,8 @@ func (ctrl *OrgUnitController) Tree(c *gin.Context) {
 	items := make([]models.OrganizationUnit, 0)
 
 	err := biz.DB().WithContext(c.Request.Context()).Order("sort_order").Find(&items).Error
-	ous := utils.BuildMenuTree(items)
+	input, _ := utils.ConvertToTreeSlice(items)
+	ous := utils.BuildTree(input)
 
 	if err != nil {
 		c.AbortWithStatusJSON(500, base.SysResult{

@@ -10,9 +10,9 @@ type UtilsController struct {
 }
 
 func (ctrl *UtilsController) RegisterRouters(v1 *gin.RouterGroup) {
-	v1.GET("/get", ctrl.Get)
+	v1.GET("/newid", ctrl.NewId)
 }
 
-func (ctrl *UtilsController) Get(ctx *gin.Context) {
+func (ctrl *UtilsController) NewId(ctx *gin.Context) {
 	ctrl.BaseController.GeneratID(ctx)
 }

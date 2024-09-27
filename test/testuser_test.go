@@ -36,14 +36,14 @@ func TestSaveUser(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u := &models.User{
-		Id:             "eaeff30b-2d57-4732-b5a2-d3f6f0a5a710",
 		Account:        "admin",
 		Email:          "wing@fire.loc",
-		OUId:           "1328680589330485248",
+		OUId:           1328680589330485249,
 		OU:             "XX软件有限公司",
 		EmailConfirmed: true,
 		LockoutEnd:     null.TimeFrom(time.Now()),
 	}
+	u.Id = 1838872840128958464
 	jsonbyte, _ := json.Marshal(u)
 
 	tmp := make(map[string]interface{})

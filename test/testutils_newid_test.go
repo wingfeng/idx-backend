@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	utilsroles_path = "/api/v1/system/utils/"
+	api_path = "/api/v1/system/utils/"
 )
 
-func TestGetUtilsRoles(t *testing.T) {
+func TestUtilsNewId(t *testing.T) {
 	router := SetupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", utilsroles_path+"get", nil)
+	req, _ := http.NewRequest("GET", api_path+"newid", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, 200)

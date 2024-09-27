@@ -38,7 +38,8 @@ func (ctrl *MenuController) PermissionTree(c *gin.Context) {
 
 	biz.DB().Model(&models.MenuItem{}).Order("sort_order").Find(&items)
 	items = filterMenu(items, biz.User, *biz.Enforcer)
-	menus := utils.BuildMenuTree(items)
+	input, _ := utils.ConvertToTreeSlice(items)
+	menus := utils.BuildTree(input)
 	c.JSON(200, base.SysResult{
 		Code: 200,
 		Msg:  "",
@@ -55,7 +56,8 @@ func (ctrl *MenuController) Tree(c *gin.Context) {
 	biz := ctrl.Prepare(c)
 	items := make([]models.MenuItem, 0)
 	biz.DB().Order("sort_order").Find(&items)
-	menus := utils.BuildMenuTree(items)
+	input, _ := utils.ConvertToTreeSlice(items)
+	menus := utils.BuildTree(input)
 	c.JSON(200, base.SysResult{
 		Code: 200,
 		Msg:  "",

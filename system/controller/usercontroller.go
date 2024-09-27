@@ -8,7 +8,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	oauthUtil "github.com/wingfeng/idx-oauth2/utils"
 	"github.com/wingfeng/idx/models"
 	"github.com/wingfeng/idxadmin/base"
 	"golang.org/x/crypto/bcrypt"
@@ -72,20 +71,17 @@ func (ctrl *UserController) Save(c *gin.Context) {
 	var entity models.User
 	err := c.BindJSON(&entity)
 	if err != nil {
-		slog.Error("绑定User对象错误!,%v", err.Error())
+		slog.Error("绑定User对象错误!,%v", "error", err.Error())
 		c.AbortWithError(500, err)
 		return
 	}
-	password := "adfbcefe"
-	entity.PasswordHash, _ = oauthUtil.HashPassword(password)
-	entity.IsTemporaryPassword = true
 	biz := ctrl.Prepare(c)
 	err = biz.DB().Save(&entity).Error
 	if err != nil {
 		c.JSON(500, base.SysResult{500, "Error", err.Error()})
 		return
 	}
-	c.JSON(200, base.SysResult{200, "Success", password})
+	c.JSON(200, base.SysResult{200, "Success", ""})
 }
 func (ctrl *UserController) Delete(ctx *gin.Context) {
 	u := &models.User{}
