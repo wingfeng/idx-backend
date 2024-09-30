@@ -8,6 +8,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/wingfeng/idx-oauth2/utils"
 	"github.com/wingfeng/idx/models"
 	"github.com/wingfeng/idxadmin/base"
 	"golang.org/x/crypto/bcrypt"
@@ -62,12 +63,14 @@ func (ctrl *UserController) RegisterRouters(v1 *gin.RouterGroup) {
 	v1.POST("/page", ctrl.Page)
 	v1.GET("/get", ctrl.Get)
 	v1.POST("/changepassword", ctrl.ChangePassword)
+	v1.POST("/resetpassword", ctrl.ResetPassword)
 	v1.POST("/login", ctrl.Login)
 	v1.GET("/Plaintext", ctrl.Plaintext)
 	v1.PUT("/update", ctrl.Update)
 }
 
 func (ctrl *UserController) Save(c *gin.Context) {
+
 	var entity models.User
 	err := c.BindJSON(&entity)
 	if err != nil {
@@ -76,7 +79,8 @@ func (ctrl *UserController) Save(c *gin.Context) {
 		return
 	}
 	biz := ctrl.Prepare(c)
-	err = biz.DB().Save(&entity).Error
+
+	err = biz.DB().Omit("password_hash").Save(&entity).Error
 	if err != nil {
 		c.JSON(500, base.SysResult{500, "Error", err.Error()})
 		return
@@ -191,6 +195,52 @@ func (ctrl *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
+}
+func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
+	request := struct {
+		Username string `json:"username" form:"username" binding:"required"`
+	}{}
+	if err := ctx.ShouldBind(&request); err != nil {
+
+		ctx.JSON(500, base.SysResult{
+			Code: 500,
+			Msg:  "Reset Password fail",
+			Data: "username is empty",
+		})
+		return
+	}
+	username := request.Username
+
+	biz := ctrl.Prepare(ctx)
+	//generate password with random string
+	newPassword := utils.GenerateRandomString(8)
+	newHash, err := utils.HashPassword(newPassword)
+	if err != nil {
+		ctx.JSON(500, base.SysResult{
+			Code: 500,
+			Msg:  "Reset Password fail",
+			Data: err.Error(),
+		})
+		return
+	}
+	u := map[string]interface{}{
+		"password_hash":         newHash,
+		"is_temporary_password": true,
+	}
+	err = biz.DB().Model(&models.User{}).Where("account = ?", username).Updates(u).Error
+	if err != nil {
+		ctx.JSON(500, base.SysResult{
+			Code: 500,
+			Msg:  "Reset Password fail",
+			Data: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, base.SysResult{
+		Code: 200,
+		Msg:  "Reset Password success",
+		Data: newPassword,
+	})
 }
 
 // 新建一个jwt实例
